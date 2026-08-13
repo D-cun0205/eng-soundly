@@ -12,6 +12,11 @@ let package = Package(
         .target(
             name: "EngSoundlyCore",
             path: ".",
+            exclude: [
+                "Tools", "Resources", "Sources/App", "Sources/Models/WordEntry.swift",
+                "Sources/Services", "Sources/Views", "Sources/Info.plist",
+                "project.yml", "EngSoundly.xcodeproj", "README.md",
+            ],
             sources: [
                 "Sources/Models/PhonemeMapping.swift",
                 "Sources/Diagnosis",

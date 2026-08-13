@@ -47,6 +47,11 @@ struct PracticeView: View {
                 // Record button
                 recordButton
 
+                if appModel.recorder.isRecording {
+                    Text("말이 끝나면 자동으로 분석돼요")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
                 if isProcessing {
                     ProgressView("발음 분석 중…")
                 }
@@ -57,9 +62,9 @@ struct PracticeView: View {
                 }
 
                 if let report {
-                    DiagnosisResultView(report: report) {
-                        appModel.tts.speak(word)
-                    }
+                    DiagnosisResultView(report: report,
+                                        onPlayReference: { appModel.tts.speak(word) },
+                                        onPlayUserAudio: { appModel.player.play(appModel.lastRecording) })
                 }
             }
             .padding()
@@ -94,18 +99,7 @@ struct PracticeView: View {
         errorMessage = nil
 
         if appModel.recorder.isRecording {
-            let samples = appModel.recorder.stop()
-            guard samples.count > 3_200 else {  // < 0.2 s
-                errorMessage = "녹음이 너무 짧습니다. 다시 시도해 주세요."
-                return
-            }
-            isProcessing = true
-            defer { isProcessing = false }
-            do {
-                report = try await appModel.diagnose(word: word, samples: samples)
-            } catch {
-                errorMessage = error.localizedDescription
-            }
+            await finishRecording()
         } else {
             report = nil
             guard await appModel.recorder.requestPermission() else {
@@ -113,10 +107,30 @@ struct PracticeView: View {
                 return
             }
             do {
+                appModel.recorder.onAutoStop = {
+                    Task { await finishRecording() }
+                }
                 try appModel.recorder.start()
             } catch {
                 errorMessage = "녹음을 시작할 수 없습니다: \(error.localizedDescription)"
             }
+        }
+    }
+
+    private func finishRecording() async {
+        guard appModel.recorder.isRecording else { return }
+        appModel.recorder.onAutoStop = nil
+        let samples = appModel.recorder.stop()
+        guard samples.count > 3_200 else {  // < 0.2 s
+            errorMessage = "녹음이 너무 짧습니다. 다시 시도해 주세요."
+            return
+        }
+        isProcessing = true
+        defer { isProcessing = false }
+        do {
+            report = try await appModel.diagnose(word: word, samples: samples)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

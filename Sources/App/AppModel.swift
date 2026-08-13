@@ -10,7 +10,11 @@ final class AppModel: ObservableObject {
     let dictionary = PronunciationDictionary()
     let recorder = AudioRecorder()
     let tts = TTSService()
+    let player = SamplePlayer()
     private(set) var recognizer: PhonemeRecognizer
+
+    /// The samples behind the most recent diagnosis, for "내 발음 듣기".
+    private(set) var lastRecording: [Float] = []
 
     init() {
         if let real = CoreMLPhonemeRecognizer() {
@@ -38,10 +42,12 @@ final class AppModel: ObservableObject {
             throw NSError(domain: "AppModel", code: 10,
                           userInfo: [NSLocalizedDescriptionKey: "사전에 없는 단어입니다: \(word)"])
         }
+        lastRecording = samples
         let recognized = try await recognizer.recognize(samples: samples,
                                                         targetHint: variants[0])
         return DiagnosisEngine.diagnose(word: word, variants: variants,
-                                        recognized: recognized,
+                                        recognized: recognized.map(\.token),
+                                        confidences: recognized.map(\.confidence),
                                         usedMock: !recognizer.isRealModel)
     }
 }

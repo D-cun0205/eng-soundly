@@ -9,8 +9,21 @@ final class AudioRecorder: ObservableObject {
     @Published var isRecording = false
     @Published var level: Float = 0     // rough RMS for the level meter
 
+    /// Called on the main actor when speech was heard and then trailed off
+    /// (or the model's 5 s window is nearly full). The owner should stop()
+    /// and run diagnosis, same as a manual stop.
+    var onAutoStop: (() -> Void)?
+
     private let engine = AVAudioEngine()
     private var samples: [Float] = []
+
+    // Voice-activity tracking for auto-stop.
+    private var heardSpeech = false
+    private var silenceSampleRun = 0
+    private static let speechRMS: Float = 0.02
+    private static let silenceRMS: Float = 0.01
+    private static let trailingSilenceSamples = 14_400   // 0.9 s
+    private static let maxSamples = 76_800               // 4.8 s (model window is 5 s)
 
     func requestPermission() async -> Bool {
         await AVAudioApplication.requestRecordPermission()
@@ -18,6 +31,8 @@ final class AudioRecorder: ObservableObject {
 
     func start() throws {
         samples.removeAll()
+        heardSpeech = false
+        silenceSampleRun = 0
 
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playAndRecord, mode: .measurement, options: [.defaultToSpeaker])
@@ -51,8 +66,22 @@ final class AudioRecorder: ObservableObject {
             let chunk = Array(UnsafeBufferPointer(start: ch[0], count: Int(out.frameLength)))
             let rms = sqrt(chunk.reduce(0) { $0 + $1 * $1 } / Float(chunk.count))
             Task { @MainActor [weak self] in
-                self?.samples.append(contentsOf: chunk)
-                self?.level = rms
+                guard let self, self.isRecording else { return }
+                self.samples.append(contentsOf: chunk)
+                self.level = rms
+
+                // Voice-activity: fire onAutoStop once speech has been heard
+                // and then trails off, or when the model window is nearly full.
+                if rms > Self.speechRMS {
+                    self.heardSpeech = true
+                    self.silenceSampleRun = 0
+                } else if rms < Self.silenceRMS {
+                    self.silenceSampleRun += chunk.count
+                }
+                let trailedOff = self.heardSpeech && self.silenceSampleRun >= Self.trailingSilenceSamples
+                if trailedOff || self.samples.count >= Self.maxSamples {
+                    self.onAutoStop?()
+                }
             }
         }
 

@@ -1,13 +1,20 @@
 import CoreML
 import Foundation
 
+/// One recognized phoneme with the model's confidence in it (softmax
+/// probability of the winning token at its best frame, 0…1).
+struct RecognizedPhoneme {
+    let token: String
+    let confidence: Float
+}
+
 /// Turns 16 kHz audio samples into a canonical-IPA phoneme sequence.
 protocol PhonemeRecognizer {
     /// True when backed by the real acoustic model (vs. demo mock).
     var isRealModel: Bool { get }
     /// `targetHint` lets the mock produce meaningful demo output; the real
     /// recognizer ignores it entirely — no target leakage into recognition.
-    func recognize(samples: [Float], targetHint: [String]) async throws -> [String]
+    func recognize(samples: [Float], targetHint: [String]) async throws -> [RecognizedPhoneme]
 }
 
 // MARK: - Core ML (wav2vec2 phoneme CTC)
@@ -64,7 +71,7 @@ final class CoreMLPhonemeRecognizer: PhonemeRecognizer {
         _ = try? await recognize(samples: [Float](repeating: 0, count: 80_000), targetHint: [])
     }
 
-    func recognize(samples: [Float], targetHint: [String]) async throws -> [String] {
+    func recognize(samples: [Float], targetHint: [String]) async throws -> [RecognizedPhoneme] {
         guard !samples.isEmpty else { return [] }
 
         // wav2vec2 expects zero-mean / unit-variance input.
@@ -98,13 +105,14 @@ final class CoreMLPhonemeRecognizer: PhonemeRecognizer {
     }
 
     /// Greedy CTC decode: argmax per frame → collapse repeats → drop blanks.
-    private func decodeCTC(logits: MLMultiArray) -> [String] {
+    /// Confidence per token = softmax probability at the run's best frame.
+    private func decodeCTC(logits: MLMultiArray) -> [RecognizedPhoneme] {
         let shape = logits.shape.map(\.intValue)   // [1, T, V]
         guard shape.count == 3 else { return [] }
         let t = shape[1], v = shape[2]
         let ptr = logits.dataPointer.bindMemory(to: Float.self, capacity: t * v)
 
-        var ids: [Int] = []
+        var out: [(id: Int, conf: Float)] = []
         var prev = -1
         for frame in 0..<t {
             var best = 0
@@ -114,12 +122,24 @@ final class CoreMLPhonemeRecognizer: PhonemeRecognizer {
                 bestVal = ptr[base + c]
                 best = c
             }
-            if best != prev && best != padID { ids.append(best) }
+            // Softmax probability of the winning class in this frame.
+            var denom: Float = 0
+            for c in 0..<v { denom += exp(ptr[base + c] - bestVal) }
+            let prob = 1 / denom
+
+            if best != prev && best != padID {
+                out.append((best, prob))
+            } else if best == prev && best != padID, prob > out.last?.conf ?? 0 {
+                out[out.count - 1].conf = prob   // best frame of the run
+            }
             prev = best
         }
 
-        return ids.compactMap { idToToken[$0] }
-            .compactMap { PhonemeMapping.normalizeRecognized($0) }
+        return out.compactMap { entry in
+            guard let raw = idToToken[entry.id],
+                  let token = PhonemeMapping.normalizeRecognized(raw) else { return nil }
+            return RecognizedPhoneme(token: token, confidence: entry.conf)
+        }
     }
 }
 
@@ -135,7 +155,7 @@ final class MockPhonemeRecognizer: PhonemeRecognizer {
         "z": "dʒ", "æ": "ɛ", "ɪ": "i", "ʊ": "u", "ɚ": "ə",
     ]
 
-    func recognize(samples: [Float], targetHint: [String]) async throws -> [String] {
+    func recognize(samples: [Float], targetHint: [String]) async throws -> [RecognizedPhoneme] {
         try await Task.sleep(for: .milliseconds(400))  // simulate inference latency
         var result = targetHint
         // Inject the first applicable typical error (deterministic, not random).
@@ -146,6 +166,6 @@ final class MockPhonemeRecognizer: PhonemeRecognizer {
         if let last = result.last, ["k", "t", "p", "b", "d", "ɡ"].contains(last) {
             result.append("ə")
         }
-        return result
+        return result.map { RecognizedPhoneme(token: $0, confidence: 1.0) }
     }
 }

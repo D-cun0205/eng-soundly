@@ -23,10 +23,17 @@ struct DiagnosisReport {
 
 enum DiagnosisEngine {
 
+    /// Substitutions/insertions whose recognized token scored below this are
+    /// treated as "not confidently heard" and never flagged: a wrong flag is
+    /// worse than a missed one.
+    static let confidenceGate: Float = 0.45
+
     /// Diagnose against all pronunciation variants; keep the closest one.
+    /// `confidences[i]` (optional) is the model's confidence in `recognized[i]`.
     static func diagnose(word: String,
                          variants: [[String]],
                          recognized: [String],
+                         confidences: [Float]? = nil,
                          usedMock: Bool) -> DiagnosisReport {
         let target = variants.min {
             PhonemeAligner.normalizedCost(target: $0, actual: recognized)
@@ -39,8 +46,16 @@ enum DiagnosisEngine {
 
         let lastTargetIdx = ops.lastIndex(where: { $0.target != nil })
 
+        var actualIdx = -1   // index into `recognized` for ops that consume a token
+
         for (idx, op) in ops.enumerated() {
+            if op.actual != nil { actualIdx += 1 }
             guard op.kind != .match else { continue }
+
+            // Low-confidence evidence: don't flag, don't penalize.
+            if op.actual != nil, let confidences,
+               actualIdx < confidences.count,
+               confidences[actualIdx] < Self.confidenceGate { continue }
 
             // Allophones of the target are not errors (flap for t/d, glottal for t).
             if op.kind == .substitute, let t = op.target, let a = op.actual,

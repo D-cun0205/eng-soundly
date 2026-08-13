@@ -3,6 +3,7 @@ import SwiftUI
 struct DiagnosisResultView: View {
     let report: DiagnosisReport
     let onPlayReference: () -> Void
+    var onPlayUserAudio: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -49,6 +50,25 @@ struct DiagnosisResultView: View {
                 }
                 .font(.caption2)
             }
+
+            // A/B listening: own recording vs native reference
+            HStack(spacing: 12) {
+                if let onPlayUserAudio {
+                    Button {
+                        onPlayUserAudio()
+                    } label: {
+                        Label("내 발음", systemImage: "person.wave.2")
+                    }
+                    .buttonStyle(.bordered)
+                }
+                Button {
+                    onPlayReference()
+                } label: {
+                    Label("원어민", systemImage: "speaker.wave.2")
+                }
+                .buttonStyle(.bordered)
+            }
+            .font(.subheadline)
 
             // Issues
             if report.issues.isEmpty {

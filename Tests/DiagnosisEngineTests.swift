@@ -81,6 +81,46 @@ final class DiagnosisEngineTests: XCTestCase {
         XCTAssertFalse(report.issues.isEmpty)
     }
 
+    // MARK: - Confidence gating
+
+    func testLowConfidenceSubstitutionNotFlagged() {
+        // r→l heard, but the model was unsure about the l — don't flag it.
+        let report = DiagnosisEngine.diagnose(
+            word: "rice", variants: [["ɹ", "aɪ", "s"]],
+            recognized: ["l", "aɪ", "s"],
+            confidences: [0.3, 0.99, 0.99], usedMock: false)
+        XCTAssertTrue(report.issues.isEmpty)
+        XCTAssertEqual(report.score, 100)
+    }
+
+    func testHighConfidenceSubstitutionStillFlagged() {
+        let report = DiagnosisEngine.diagnose(
+            word: "rice", variants: [["ɹ", "aɪ", "s"]],
+            recognized: ["l", "aɪ", "s"],
+            confidences: [0.9, 0.99, 0.99], usedMock: false)
+        XCTAssertFalse(report.issues.isEmpty)
+        XCTAssertLessThan(report.score, 100)
+    }
+
+    func testLowConfidenceInsertionNotFlagged() {
+        // Faint trailing vowel the model barely believes in → ignore.
+        let report = DiagnosisEngine.diagnose(
+            word: "think", variants: [["θ", "ɪ", "ŋ", "k"]],
+            recognized: ["θ", "ɪ", "ŋ", "k", "ə"],
+            confidences: [0.9, 0.9, 0.9, 0.9, 0.2], usedMock: false)
+        XCTAssertTrue(report.issues.isEmpty)
+        XCTAssertEqual(report.score, 100)
+    }
+
+    func testDeletionNotAffectedByGating() {
+        // Deletions consume no recognized token — gating must not skip them.
+        let report = DiagnosisEngine.diagnose(
+            word: "think", variants: [["θ", "ɪ", "ŋ", "k"]],
+            recognized: ["θ", "ɪ", "ŋ"],
+            confidences: [0.9, 0.9, 0.9], usedMock: false)
+        XCTAssertFalse(report.issues.isEmpty)
+    }
+
     // MARK: - Phoneme mapping
 
     func testArpabetToIPA() {
