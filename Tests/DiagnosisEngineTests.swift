@@ -143,6 +143,38 @@ final class DiagnosisEngineTests: XCTestCase {
         XCTAssertFalse(normalized.contains { $0.contains("ː") })
     }
 
+    // MARK: - Candidate ranking
+
+    private let miniLexicon: [CandidateRanker.Entry] = [
+        .init(word: "hello", rank: 100, variants: [["h", "ə", "l", "oʊ"], ["h", "ɛ", "l", "oʊ"]]),
+        .init(word: "hollow", rank: 5_000, variants: [["h", "ɑ", "l", "oʊ"]]),
+        .init(word: "halo", rank: 12_000, variants: [["h", "eɪ", "l", "oʊ"]]),
+        .init(word: "world", rank: 300, variants: [["w", "ɚ", "l", "d"]]),
+    ]
+
+    func testCandidateExactMatchWinsAndNearMissFollows() {
+        // Clear [h ɛ l oʊ] → hello first; hollow appears as a candidate.
+        let result = CandidateRanker.nearestWords(to: ["h", "ɛ", "l", "oʊ"],
+                                                  lexicon: miniLexicon)
+        XCTAssertEqual(result.first?.word, "hello")
+        XCTAssertTrue(result.map(\.word).contains("hollow"))
+        XCTAssertFalse(result.map(\.word).contains("world"))
+    }
+
+    func testCandidateFrequencyBreaksPhoneticTie() {
+        // [h ʌ l oʊ] sits between hello(ə) and hollow(ɑ) — the far more
+        // common "hello" should outrank "hollow".
+        let result = CandidateRanker.nearestWords(to: ["h", "ʌ", "l", "oʊ"],
+                                                  lexicon: miniLexicon)
+        let words = result.map(\.word)
+        XCTAssertLessThan(words.firstIndex(of: "hello") ?? .max,
+                          words.firstIndex(of: "hollow") ?? .max)
+    }
+
+    func testCandidateEmptyInputGivesNothing() {
+        XCTAssertTrue(CandidateRanker.nearestWords(to: [], lexicon: miniLexicon).isEmpty)
+    }
+
     func testVoicingOnlyPairDetection() {
         XCTAssertTrue(PhonemeMapping.isVoicingOnlyPair("s", "z"))
         XCTAssertTrue(PhonemeMapping.isVoicingOnlyPair("t", "d"))
