@@ -35,6 +35,9 @@ enum DiagnosisEngine {
 
         let ops = PhonemeAligner.align(target: target, actual: recognized)
         var issues: [DiagnosedIssue] = []
+        var penalty = 0.0
+
+        let lastTargetIdx = ops.lastIndex(where: { $0.target != nil })
 
         for (idx, op) in ops.enumerated() {
             guard op.kind != .match else { continue }
@@ -42,6 +45,22 @@ enum DiagnosisEngine {
             // Allophones of the target are not errors (flap for t/d, glottal for t).
             if op.kind == .substitute, let t = op.target, let a = op.actual,
                PhonemeMapping.substitutionCost(t, a) <= 0.2 { continue }
+
+            // Word-final voicing-only mismatch (s/z, t/d…): the model can't
+            // hear final voicing reliably — skip rather than risk a false flag.
+            if op.kind == .substitute, idx == lastTargetIdx,
+               let t = op.target, let a = op.actual,
+               PhonemeMapping.isVoicingOnlyPair(t, a) { continue }
+
+            switch op.kind {
+            case .substitute:
+                let c = PhonemeMapping.substitutionCost(op.target ?? "", op.actual ?? "")
+                penalty += min(c / 1.8, 1.0)
+            case .delete, .insert:
+                penalty += 0.8
+            case .match:
+                break
+            }
 
             if let rule = KoreanL1Rules.match(op) {
                 // Word-final vowel epenthesis gets the more specific explanation.
@@ -62,7 +81,8 @@ enum DiagnosisEngine {
             }
         }
 
-        let score = computeScore(ops: ops, targetCount: target.count)
+        let score = target.isEmpty ? 0
+            : Int((max(0.0, 1.0 - penalty / Double(target.count)) * 100).rounded())
         return DiagnosisReport(word: word, targetIPA: target, recognizedIPA: recognized,
                                ops: ops, issues: issues, score: score, usedMockRecognizer: usedMock)
     }
@@ -99,21 +119,4 @@ enum DiagnosisEngine {
         }
     }
 
-    private static func computeScore(ops: [PhonemeOp], targetCount: Int) -> Int {
-        guard targetCount > 0 else { return 0 }
-        var penalty = 0.0
-        for op in ops {
-            switch op.kind {
-            case .match: continue
-            case .substitute:
-                let c = PhonemeMapping.substitutionCost(op.target ?? "", op.actual ?? "")
-                if c <= 0.2 { continue }               // allophone
-                penalty += min(c / 1.8, 1.0)
-            case .delete, .insert:
-                penalty += 0.8
-            }
-        }
-        let score = max(0.0, 1.0 - penalty / Double(targetCount))
-        return Int((score * 100).rounded())
-    }
 }

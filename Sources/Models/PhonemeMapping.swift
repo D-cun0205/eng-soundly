@@ -159,6 +159,9 @@ enum PhonemeMapping {
         if (a == "ɾ" && (b == "t" || b == "d")) || (b == "ɾ" && (a == "t" || a == "d")) { return 0.15 }
         // glottal stop ↔ t : near-free (allophone)
         if (a == "ʔ" && b == "t") || (b == "ʔ" && a == "t") { return 0.15 }
+        // ɑ ↔ ɔ : cot–caught merger — most GA speakers (and the acoustic
+        // model) realize dictionary /ɔ/ as [ɑ]; never flag this as an error.
+        if Set([a, b]) == Set(["ɑ", "ɔ"]) { return 0.15 }
 
         if fa.kind != fb.kind {
             // glide ↔ high vowel is plausible (w~u, j~i)
@@ -181,6 +184,15 @@ enum PhonemeMapping {
             if fa.voiced != fb.voiced { d += 0.25 }
             return min(max(d, 0.25), 1.8)
         }
+    }
+
+    /// True when two consonants differ ONLY in voicing (s/z, t/d, f/v, …).
+    /// Word-finally the acoustic model cannot hear this distinction reliably,
+    /// so diagnosis treats such word-final pairs as low-confidence and skips them.
+    static func isVoicingOnlyPair(_ a: String, _ b: String) -> Bool {
+        guard let fa = features[a], let fb = features[b],
+              fa.kind == .consonant, fb.kind == .consonant else { return false }
+        return fa.place == fb.place && fa.manner == fb.manner && fa.voiced != fb.voiced
     }
 
     /// Human-readable Korean articulation description, used for generic feedback.
