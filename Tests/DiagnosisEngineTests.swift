@@ -217,6 +217,98 @@ final class DiagnosisEngineTests: XCTestCase {
         XCTAssertNil(report.issues.first?.word)   // no word tags in word mode
     }
 
+    // MARK: - Liaison / connected speech
+
+    func testWannaContractionAchieved() {
+        // "want to go" spoken as [w ɑ n ə ɡ oʊ] (wanna): perfect score,
+        // no issues, and the contraction is recognized as achieved.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("want", [["w", "ɑ", "n", "t"]]),
+                ("to", [["t", "u"], ["t", "ɪ"], ["t", "ə"]]),
+                ("go", [["ɡ", "oʊ"]]),
+            ]),
+            recognized: ["w", "ɑ", "n", "ə", "ɡ", "oʊ"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+        XCTAssertTrue(report.liaisonTips.contains { $0.achieved && $0.title.contains("wanna") })
+    }
+
+    func testCarefulSpeechGetsSuggestionNotError() {
+        // Careful "want to go" [w ɑ n t t u ɡ oʊ]: still 100 — liaison is
+        // a tip, never an error.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("want", [["w", "ɑ", "n", "t"]]),
+                ("to", [["t", "u"], ["t", "ɪ"], ["t", "ə"]]),
+                ("go", [["ɡ", "oʊ"]]),
+            ]),
+            recognized: ["w", "ɑ", "n", "t", "t", "u", "ɡ", "oʊ"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+        XCTAssertTrue(report.liaisonTips.contains { !$0.achieved && $0.title.contains("wanna") })
+    }
+
+    func testPalatalizationDidYou() {
+        // "did you" as [d ɪ dʒ u] (디쥬): achieved palatalization, no issues.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("did", [["d", "ɪ", "d"]]),
+                ("you", [["j", "u"]]),
+            ]),
+            recognized: ["d", "ɪ", "dʒ", "u"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+        XCTAssertTrue(report.liaisonTips.contains(where: \.achieved))
+    }
+
+    func testWeakFormAndAccepted() {
+        // "you and me" with reduced and → [ə n]: correct running speech.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("you", [["j", "u"]]),
+                ("and", [["æ", "n", "d"]]),
+                ("me", [["m", "i"]]),
+            ]),
+            recognized: ["j", "u", "ə", "n", "m", "i"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+    }
+
+    func testElisionBestFriend() {
+        // "best friend" without the t between consonants: natural, no issue.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("best", [["b", "ɛ", "s", "t"]]),
+                ("friend", [["f", "ɹ", "ɛ", "n", "d"]]),
+            ]),
+            recognized: ["b", "ɛ", "s", "f", "ɹ", "ɛ", "n", "d"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+    }
+
+    func testRealErrorStillFlaggedInLiaisonContext() {
+        // "want to go" as wanna but with r→l in "go"... no r here; use
+        // f→p in "coffee": wanna-style reduction plus a genuine error must
+        // still flag the error.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("want", [["w", "ɑ", "n", "t"]]),
+                ("to", [["t", "u"], ["t", "ə"]]),
+                ("drink", [["d", "ɹ", "ɪ", "ŋ", "k"]]),
+            ]),
+            recognized: ["w", "ɑ", "n", "ə", "d", "l", "ɪ", "ŋ", "k"], usedMock: false)
+        XCTAssertFalse(report.issues.isEmpty)
+        XCTAssertEqual(report.issues.first?.word, "drink")
+        XCTAssertTrue(report.liaisonTips.contains(where: \.achieved))
+    }
+
+    func testSingleWordHasNoLiaisonTips() {
+        let report = diagnose("you", target: ["j", "u"], actual: ["j", "u"])
+        XCTAssertTrue(report.liaisonTips.isEmpty)
+        XCTAssertEqual(report.score, 100)
+    }
+
     // MARK: - Audio segmentation
 
     func testSegmenterShortAudioUntouched() {

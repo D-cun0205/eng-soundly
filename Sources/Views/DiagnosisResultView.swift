@@ -77,6 +77,32 @@ struct DiagnosisResultView: View {
                 }
             }
 
+            // Connected-speech notes (sentence mode)
+            if !report.liaisonTips.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("자연스러운 연음")
+                        .font(.headline)
+                    ForEach(report.liaisonTips) { tip in
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: tip.achieved ? "checkmark.seal.fill" : "lightbulb.fill")
+                                .foregroundStyle(tip.achieved ? .green : .yellow)
+                                .font(.subheadline)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(tip.title)
+                                    .font(.subheadline.weight(.semibold))
+                                Text(tip.detail)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background((tip.achieved ? Color.green : Color.yellow).opacity(0.08),
+                                    in: RoundedRectangle(cornerRadius: 10))
+                    }
+                }
+            }
+
             // A/B listening: own recording vs native reference
             HStack(spacing: 12) {
                 if let onPlayUserAudio {

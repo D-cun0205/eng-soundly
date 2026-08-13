@@ -36,6 +36,9 @@ struct DiagnosisReport {
     let usedMockRecognizer: Bool
     /// Per-word breakdown; more than one entry only in sentence mode.
     var wordScores: [WordScore] = []
+    /// Connected-speech notes: liaison the user produced (achieved) or
+    /// could adopt to sound more natural (suggestions). Never errors.
+    var liaisonTips: [LiaisonTip] = []
 }
 
 enum DiagnosisEngine {
@@ -65,6 +68,15 @@ enum DiagnosisEngine {
                          recognized: [String],
                          confidences: [Float]? = nil,
                          usedMock: Bool) -> DiagnosisReport {
+        // In sentences, function words also carry their reduced (weak) forms:
+        // careful /æ n d/ and running-speech /ə n/ are both correct.
+        let sentence = sentence.count > 1
+            ? sentence.map { wt in
+                LiaisonRules.weakForms[wt.word].map {
+                    WordTarget(word: wt.word, variants: wt.variants + $0)
+                } ?? wt
+            }
+            : sentence
         // Pick the pronunciation variant per word by coordinate descent:
         // start from every word's primary form, then repeatedly swap in the
         // single alternate that lowers the whole-utterance alignment cost.
@@ -90,6 +102,42 @@ enum DiagnosisEngine {
                 }
             }
             if !improved { break }
+        }
+
+        // Connected-speech pass: try each natural contraction/link. If the
+        // audio matches the linked form better, the speaker used liaison —
+        // praise it. If the careful form fits better, that's NOT an error;
+        // surface the liaison as a naturalness tip instead.
+        var liaisonTips: [LiaisonTip] = []
+        if sentence.count > 1 {
+            let transforms = LiaisonRules.transforms(words: sentence.map(\.word),
+                                                     combo: bestCombo)
+            // Several rules can fire on the same boundary (wanna also implies
+            // t-elision); report at most one tip per word, rule order = priority.
+            var tippedWords = Set<Int>()
+            for transform in transforms {
+                guard tippedWords.isDisjoint(with: transform.wordIndices) else { continue }
+                let trial = transform.apply(bestCombo)
+                let cost = PhonemeAligner.normalizedCost(target: trial.flatMap { $0 },
+                                                         actual: recognized)
+                if cost < bestCost {
+                    bestCombo = trial
+                    bestCost = cost
+                    liaisonTips.append(LiaisonTip(
+                        title: transform.title,
+                        detail: "원어민처럼 자연스럽게 이어 발음했어요!",
+                        achieved: true))
+                } else {
+                    liaisonTips.append(LiaisonTip(title: transform.title,
+                                                  detail: transform.tip,
+                                                  achieved: false))
+                }
+                tippedWords.formUnion(transform.wordIndices)
+            }
+            // Keep every achievement; don't overwhelm with suggestions.
+            let achieved = liaisonTips.filter(\.achieved)
+            let suggested = liaisonTips.filter { !$0.achieved }.prefix(3)
+            liaisonTips = achieved + suggested
         }
 
         // Word boundaries inside the flattened target.
@@ -183,7 +231,8 @@ enum DiagnosisEngine {
 
         return DiagnosisReport(word: title, targetIPA: target, recognizedIPA: recognized,
                                ops: ops, issues: issues, score: score,
-                               usedMockRecognizer: usedMock, wordScores: wordScores)
+                               usedMockRecognizer: usedMock, wordScores: wordScores,
+                               liaisonTips: liaisonTips)
     }
 
     private static func genericIssue(for op: PhonemeOp) -> DiagnosedIssue {

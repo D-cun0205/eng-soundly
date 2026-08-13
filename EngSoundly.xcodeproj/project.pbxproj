@@ -16,6 +16,7 @@
 		52E9DF63F11ADACE2593D9C1 /* PronunciationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97EBBE12615C58A9FAEEFF73 /* PronunciationDictionary.swift */; };
 		64BC8B8B3D2218C97557748A /* PhonemeAligner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1AB1E18BD041CCDD3D345 /* PhonemeAligner.swift */; };
 		7AEEC502B90CB1A5B3B24BFA /* word_freq.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D830581EB2BB40933068DA5 /* word_freq.txt */; };
+		7CB769E745974BF6B33F4E97 /* LiaisonRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3448C6268882D5DE9269DB8B /* LiaisonRules.swift */; };
 		7F3F232E0A66AF3B20AB844E /* PhonemeCTC.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = AEAB3DD50BCB893756E4D329 /* PhonemeCTC.mlpackage */; };
 		80363CF2B92A402A91FDF5B0 /* words.json in Resources */ = {isa = PBXBuildFile; fileRef = EC6CA6580E432AC14794DC87 /* words.json */; };
 		8994DF4BF960282459F557E3 /* KoreanL1Rules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC62A7B3F278BB3020932989 /* KoreanL1Rules.swift */; };
@@ -39,6 +40,7 @@
 		10E9866747DAC7BD1A9B9EB0 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		1F8A2C0BFF16420FAE9FFEF7 /* AudioSegmenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSegmenter.swift; sourceTree = "<group>"; };
 		248ED376D8CD5960455B50B9 /* WordEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordEntry.swift; sourceTree = "<group>"; };
+		3448C6268882D5DE9269DB8B /* LiaisonRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiaisonRules.swift; sourceTree = "<group>"; };
 		372098F7D93878CC97CC72F7 /* WordCandidateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCandidateService.swift; sourceTree = "<group>"; };
 		377F69670EDE1743B2EBC76A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4088845DC143352BB5330F9A /* EngSoundlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngSoundlyApp.swift; sourceTree = "<group>"; };
@@ -85,6 +87,7 @@
 				6738C1E3D56D2E149285B281 /* CandidateRanker.swift */,
 				8E4B5E0A750D79D17CFE02B0 /* DiagnosisEngine.swift */,
 				AC62A7B3F278BB3020932989 /* KoreanL1Rules.swift */,
+				3448C6268882D5DE9269DB8B /* LiaisonRules.swift */,
 				C0B1AB1E18BD041CCDD3D345 /* PhonemeAligner.swift */,
 			);
 			path = Diagnosis;
@@ -249,6 +252,7 @@
 				CEAC60C65A4380C7560996E7 /* EngSoundlyApp.swift in Sources */,
 				2D20FC6EAC3412B477802FEC /* FreePracticeView.swift in Sources */,
 				8994DF4BF960282459F557E3 /* KoreanL1Rules.swift in Sources */,
+				7CB769E745974BF6B33F4E97 /* LiaisonRules.swift in Sources */,
 				64BC8B8B3D2218C97557748A /* PhonemeAligner.swift in Sources */,
 				7F3F232E0A66AF3B20AB844E /* PhonemeCTC.mlpackage in Sources */,
 				90077918D2A0A990F27113C1 /* PhonemeMapping.swift in Sources */,
