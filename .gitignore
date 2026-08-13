@@ -7,3 +7,4 @@ Tools/cmudict.dict
 xcuserdata/
 # Core ML model is large — regenerate with Tools/convert_model.py
 Resources/PhonemeCTC.mlpackage
+.build/

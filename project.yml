@@ -34,3 +34,5 @@ targets:
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: false
         COREML_CODEGEN_LANGUAGE: None
+# NOTE: unit tests live in Tests/ and run on macOS via SwiftPM (`swift test`,
+# see Package.swift) — this Xcode install can't run simulator test destinations.
