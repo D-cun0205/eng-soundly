@@ -58,6 +58,12 @@ final class CoreMLPhonemeRecognizer: PhonemeRecognizer {
         }
     }
 
+    /// Runs one throwaway prediction so Core ML compiles/caches the model
+    /// before the user's first real attempt.
+    func warmUp() async {
+        _ = try? await recognize(samples: [Float](repeating: 0, count: 80_000), targetHint: [])
+    }
+
     func recognize(samples: [Float], targetHint: [String]) async throws -> [String] {
         guard !samples.isEmpty else { return [] }
 
@@ -68,10 +74,12 @@ final class CoreMLPhonemeRecognizer: PhonemeRecognizer {
         let std = max(sqrt(variance), 1e-7)
         for i in x.indices { x[i] = (x[i] - mean) / std }
 
-        if let fixed = fixedInputLength {
-            if x.count < fixed { x.append(contentsOf: [Float](repeating: 0, count: fixed - x.count)) }
-            if x.count > fixed { x = Array(x.prefix(fixed)) }
-        }
+        // Always pad/trim to one canonical length, even with a flexible-shape
+        // model: each distinct input shape triggers a fresh (slow) compile on
+        // the Neural Engine, so we keep the shape constant across calls.
+        let canonical = fixedInputLength ?? 80_000
+        if x.count < canonical { x.append(contentsOf: [Float](repeating: 0, count: canonical - x.count)) }
+        if x.count > canonical { x = Array(x.prefix(canonical)) }
 
         let array = try MLMultiArray(shape: [1, NSNumber(value: x.count)], dataType: .float32)
         x.withUnsafeBufferPointer { src in

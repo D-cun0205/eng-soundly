@@ -16,6 +16,7 @@ final class AppModel: ObservableObject {
         if let real = CoreMLPhonemeRecognizer() {
             recognizer = real
             isDemoMode = false
+            Task.detached(priority: .utility) { await real.warmUp() }
         } else {
             recognizer = MockPhonemeRecognizer()
             isDemoMode = true
