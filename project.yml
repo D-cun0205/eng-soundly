@@ -12,6 +12,11 @@ targets:
       - path: Sources
       - path: Resources
         buildPhase: resources
+        excludes:
+          - "PhonemeCTC.mlpackage"
+      # Core ML model compiles to .mlmodelc at build time via the sources phase
+      - path: Resources/PhonemeCTC.mlpackage
+        buildPhase: sources
     info:
       path: Sources/Info.plist
       properties:

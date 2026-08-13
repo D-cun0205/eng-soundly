@@ -7,11 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D8DB36BDDEA53679C63A712 /* phoneme_model_info.json in Resources */ = {isa = PBXBuildFile; fileRef = E3A249D23145BCC016C03415 /* phoneme_model_info.json */; };
 		307A4311961D487D7D844E4F /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7480E70DBB74C6A603421F /* AudioRecorder.swift */; };
 		387074C627CEEC599B865965 /* TTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F7A2CE5CFF10F066A2BDA3 /* TTSService.swift */; };
 		413EDB43EC55D060AADDD2B6 /* DiagnosisResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A7689135029A7ECA372F15 /* DiagnosisResultView.swift */; };
+		4610C322D62DCA6857E7A2DB /* phoneme_vocab.json in Resources */ = {isa = PBXBuildFile; fileRef = 42148E07FBD3D8C9CA800A2A /* phoneme_vocab.json */; };
 		52E9DF63F11ADACE2593D9C1 /* PronunciationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97EBBE12615C58A9FAEEFF73 /* PronunciationDictionary.swift */; };
 		64BC8B8B3D2218C97557748A /* PhonemeAligner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B1AB1E18BD041CCDD3D345 /* PhonemeAligner.swift */; };
+		7F3F232E0A66AF3B20AB844E /* PhonemeCTC.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = AEAB3DD50BCB893756E4D329 /* PhonemeCTC.mlpackage */; };
 		80363CF2B92A402A91FDF5B0 /* words.json in Resources */ = {isa = PBXBuildFile; fileRef = EC6CA6580E432AC14794DC87 /* words.json */; };
 		8994DF4BF960282459F557E3 /* KoreanL1Rules.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC62A7B3F278BB3020932989 /* KoreanL1Rules.swift */; };
 		90077918D2A0A990F27113C1 /* PhonemeMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF82DD0B910C9181FAF128FE /* PhonemeMapping.swift */; };
@@ -30,6 +33,7 @@
 		248ED376D8CD5960455B50B9 /* WordEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordEntry.swift; sourceTree = "<group>"; };
 		377F69670EDE1743B2EBC76A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4088845DC143352BB5330F9A /* EngSoundlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngSoundlyApp.swift; sourceTree = "<group>"; };
+		42148E07FBD3D8C9CA800A2A /* phoneme_vocab.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = phoneme_vocab.json; sourceTree = "<group>"; };
 		5AAE0A9FCF534700D9149822 /* PracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeView.swift; sourceTree = "<group>"; };
 		662AF82ECECDC786F5C7C387 /* cmudict.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = cmudict.txt; sourceTree = "<group>"; };
 		7D58121AE535289C0C640DAF /* EngSoundly.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = EngSoundly.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -37,11 +41,13 @@
 		8F7480E70DBB74C6A603421F /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		97EBBE12615C58A9FAEEFF73 /* PronunciationDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationDictionary.swift; sourceTree = "<group>"; };
 		AC62A7B3F278BB3020932989 /* KoreanL1Rules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoreanL1Rules.swift; sourceTree = "<group>"; };
+		AEAB3DD50BCB893756E4D329 /* PhonemeCTC.mlpackage */ = {isa = PBXFileReference; path = PhonemeCTC.mlpackage; sourceTree = "<group>"; };
 		AF82DD0B910C9181FAF128FE /* PhonemeMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhonemeMapping.swift; sourceTree = "<group>"; };
 		C0B1AB1E18BD041CCDD3D345 /* PhonemeAligner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhonemeAligner.swift; sourceTree = "<group>"; };
 		C2735929A55627021D238765 /* PhonemeRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhonemeRecognizer.swift; sourceTree = "<group>"; };
 		DADF3FF8C3E289855F41B2AA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E2F7A2CE5CFF10F066A2BDA3 /* TTSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSService.swift; sourceTree = "<group>"; };
+		E3A249D23145BCC016C03415 /* phoneme_model_info.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = phoneme_model_info.json; sourceTree = "<group>"; };
 		EC6CA6580E432AC14794DC87 /* words.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = words.json; sourceTree = "<group>"; };
 		F4A7689135029A7ECA372F15 /* DiagnosisResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosisResultView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -130,6 +136,9 @@
 			isa = PBXGroup;
 			children = (
 				662AF82ECECDC786F5C7C387 /* cmudict.txt */,
+				E3A249D23145BCC016C03415 /* phoneme_model_info.json */,
+				42148E07FBD3D8C9CA800A2A /* phoneme_vocab.json */,
+				AEAB3DD50BCB893756E4D329 /* PhonemeCTC.mlpackage */,
 				EC6CA6580E432AC14794DC87 /* words.json */,
 			);
 			path = Resources;
@@ -195,6 +204,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBF070499A2DF85A030A4ABA /* cmudict.txt in Resources */,
+				1D8DB36BDDEA53679C63A712 /* phoneme_model_info.json in Resources */,
+				4610C322D62DCA6857E7A2DB /* phoneme_vocab.json in Resources */,
 				80363CF2B92A402A91FDF5B0 /* words.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -214,6 +225,7 @@
 				CEAC60C65A4380C7560996E7 /* EngSoundlyApp.swift in Sources */,
 				8994DF4BF960282459F557E3 /* KoreanL1Rules.swift in Sources */,
 				64BC8B8B3D2218C97557748A /* PhonemeAligner.swift in Sources */,
+				7F3F232E0A66AF3B20AB844E /* PhonemeCTC.mlpackage in Sources */,
 				90077918D2A0A990F27113C1 /* PhonemeMapping.swift in Sources */,
 				C58052A463F8F5614B9D17D1 /* PhonemeRecognizer.swift in Sources */,
 				9707BD99C575DF87130959B9 /* PracticeView.swift in Sources */,

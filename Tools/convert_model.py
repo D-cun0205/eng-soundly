@@ -18,7 +18,8 @@ DEFAULT_LEN = 80_000  # 5 s @ 16 kHz
 
 
 def main():
-    from transformers import Wav2Vec2ForCTC, AutoProcessor
+    from huggingface_hub import hf_hub_download
+    from transformers import Wav2Vec2ForCTC
     import coremltools as ct
 
     print("loading model…", flush=True)
@@ -26,8 +27,11 @@ def main():
     model.eval()
     model.config.return_dict = False
 
-    processor = AutoProcessor.from_pretrained(MODEL_ID)
-    vocab = processor.tokenizer.get_vocab()
+    # Fetch vocab.json directly — the phoneme tokenizer needs the `phonemizer`
+    # package (espeak backend) which we don't need just for the id→token map.
+    vocab_path = hf_hub_download(MODEL_ID, "vocab.json")
+    with open(vocab_path, encoding="utf-8") as f:
+        vocab = json.load(f)
     os.makedirs(OUT_DIR, exist_ok=True)
     with open(os.path.join(OUT_DIR, "phoneme_vocab.json"), "w", encoding="utf-8") as f:
         json.dump(vocab, f, ensure_ascii=False, indent=1)

@@ -1,0 +1,7 @@
+{
+ "model": "facebook/wav2vec2-lv-60-espeak-cv-ft",
+ "input_mode": "flexible",
+ "default_len": 80000,
+ "normalize": true,
+ "sample_rate": 16000
+}
