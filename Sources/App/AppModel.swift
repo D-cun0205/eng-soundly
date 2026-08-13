@@ -13,6 +13,7 @@ final class AppModel: ObservableObject {
     let player = SamplePlayer()
     let intent = SpeechIntentService()
     let candidates = WordCandidateService()
+    let progress = ProgressStore()
     private(set) var recognizer: PhonemeRecognizer
 
     /// The samples behind the most recent diagnosis, for "내 발음 듣기".
@@ -96,10 +97,12 @@ final class AppModel: ObservableObject {
             return WordTarget(word: word, variants: prons)
         }
 
-        return DiagnosisEngine.diagnose(sentence: sentence, displayText: text,
-                                        recognized: attempt.recognized.map(\.token),
-                                        confidences: attempt.recognized.map(\.confidence),
-                                        usedMock: !recognizer.isRealModel)
+        let report = DiagnosisEngine.diagnose(sentence: sentence, displayText: text,
+                                              recognized: attempt.recognized.map(\.token),
+                                              confidences: attempt.recognized.map(\.confidence),
+                                              usedMock: !recognizer.isRealModel)
+        if !report.usedMockRecognizer { progress.record(report) }
+        return report
     }
 
     /// Run the full pipeline for one attempt.
@@ -112,9 +115,11 @@ final class AppModel: ObservableObject {
         lastRecording = samples
         let recognized = try await recognizer.recognize(samples: samples,
                                                         targetHint: variants[0])
-        return DiagnosisEngine.diagnose(word: word, variants: variants,
-                                        recognized: recognized.map(\.token),
-                                        confidences: recognized.map(\.confidence),
-                                        usedMock: !recognizer.isRealModel)
+        let report = DiagnosisEngine.diagnose(word: word, variants: variants,
+                                              recognized: recognized.map(\.token),
+                                              confidences: recognized.map(\.confidence),
+                                              usedMock: !recognizer.isRealModel)
+        if !report.usedMockRecognizer { progress.record(report) }
+        return report
     }
 }

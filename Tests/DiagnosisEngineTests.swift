@@ -309,6 +309,58 @@ final class DiagnosisEngineTests: XCTestCase {
         XCTAssertEqual(report.score, 100)
     }
 
+    // MARK: - Progress tracking & drills
+
+    @MainActor
+    func testProgressAccumulatesAttemptsAndErrors() {
+        let tmp = FileManager.default.temporaryDirectory
+            .appendingPathComponent("progress-test-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        let store = ProgressStore(fileURL: tmp)
+
+        // rice with r→l: ɹ attempted+errored; aɪ, s attempted clean.
+        store.record(diagnose("rice", target: ["ɹ", "aɪ", "s"], actual: ["l", "aɪ", "s"]))
+        store.record(diagnose("rice", target: ["ɹ", "aɪ", "s"], actual: ["l", "aɪ", "s"]))
+        store.record(diagnose("rice", target: ["ɹ", "aɪ", "s"], actual: ["ɹ", "aɪ", "s"]))
+
+        XCTAssertEqual(store.stats["ɹ"]?.attempts, 3)
+        XCTAssertEqual(store.stats["ɹ"]?.errors, 2)
+        XCTAssertEqual(store.stats["aɪ"]?.errors, 0)
+
+        let weak = store.weakestPhonemes
+        XCTAssertEqual(weak.first?.phoneme, "ɹ")
+        // Clean phonemes (0 errors) never appear as "weak".
+        XCTAssertFalse(weak.contains { $0.phoneme == "aɪ" })
+
+        // Round-trips through disk.
+        let reloaded = ProgressStore(fileURL: tmp)
+        XCTAssertEqual(reloaded.stats["ɹ"], store.stats["ɹ"])
+    }
+
+    @MainActor
+    func testProgressIgnoresLenientMismatches() {
+        let tmp = FileManager.default.temporaryDirectory
+            .appendingPathComponent("progress-test-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        let store = ProgressStore(fileURL: tmp)
+
+        // Word-final voicing (rice → raɪz) is leniency-skipped → no error.
+        store.record(diagnose("rice", target: ["ɹ", "aɪ", "s"], actual: ["ɹ", "aɪ", "z"]))
+        XCTAssertEqual(store.stats["s"]?.attempts, 1)
+        XCTAssertEqual(store.stats["s"]?.errors, 0)
+    }
+
+    func testDrillBuilderFindsCommonWordsWithPhoneme() {
+        let lexicon: [CandidateRanker.Entry] = [
+            .init(word: "the", rank: 0, variants: [["ð", "ə"]]),          // too short (2)
+            .init(word: "think", rank: 10, variants: [["θ", "ɪ", "ŋ", "k"]]),
+            .init(word: "birthday", rank: 40, variants: [["b", "ɚ", "θ", "d", "eɪ"]]),
+            .init(word: "sink", rank: 5, variants: [["s", "ɪ", "ŋ", "k"]]),  // no θ
+        ]
+        let words = DrillBuilder.words(containing: "θ", lexicon: lexicon)
+        XCTAssertEqual(words, ["think", "birthday"])   // frequency order, θ only
+    }
+
     // MARK: - Audio segmentation
 
     func testSegmenterShortAudioUntouched() {

@@ -31,4 +31,9 @@ final class WordCandidateService {
         CandidateRanker.nearestWords(to: recognized, lexicon: lexicon, limit: limit)
             .map(\.word)
     }
+
+    /// Common words containing a phoneme, for weak-phoneme drills.
+    func drillWords(for phoneme: String, limit: Int = 8) -> [String] {
+        DrillBuilder.words(containing: phoneme, lexicon: lexicon, limit: limit)
+    }
 }

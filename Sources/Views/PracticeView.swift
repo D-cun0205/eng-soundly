@@ -2,6 +2,8 @@ import SwiftUI
 
 struct PracticeView: View {
     let word: String
+    /// Called after each successful diagnosis (used by drill sessions).
+    var onDiagnosed: ((DiagnosisReport) -> Void)? = nil
 
     @EnvironmentObject private var appModel: AppModel
     @State private var report: DiagnosisReport?
@@ -129,7 +131,9 @@ struct PracticeView: View {
         isProcessing = true
         defer { isProcessing = false }
         do {
-            report = try await appModel.diagnose(word: word, samples: samples)
+            let result = try await appModel.diagnose(word: word, samples: samples)
+            report = result
+            onDiagnosed?(result)
         } catch {
             errorMessage = error.localizedDescription
         }

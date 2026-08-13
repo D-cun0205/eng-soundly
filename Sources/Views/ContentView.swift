@@ -10,6 +10,13 @@ struct ContentView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink {
+                            ProgressDashboardView(progress: appModel.progress)
+                        } label: {
+                            Label("내 발음 리포트", systemImage: "chart.bar")
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
                             WordCatalogView()
                         } label: {
                             Label("연습 단어장", systemImage: "book")

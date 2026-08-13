@@ -8,6 +8,7 @@ import PackageDescription
 
 let package = Package(
     name: "EngSoundlyCore",
+    platforms: [.macOS(.v14), .iOS(.v17)],
     targets: [
         .target(
             name: "EngSoundlyCore",
@@ -19,6 +20,7 @@ let package = Package(
             ],
             sources: [
                 "Sources/Models/PhonemeMapping.swift",
+                "Sources/Models/ProgressStore.swift",
                 "Sources/Diagnosis",
             ]
         ),
