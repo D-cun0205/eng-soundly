@@ -39,13 +39,15 @@ final class SamplePlayer: ObservableObject {
 
         isPlaying = true
         player.scheduleBuffer(buffer) { [weak self] in
-            Task { @MainActor [weak self] in self?.isPlaying = false }
+            Task { @MainActor [weak self] in self?.stop() }
         }
         player.play()
     }
 
     func stop() {
         player.stop()
+        // Leaving the engine running spams CoreAudio errors while idle.
+        if engine.isRunning { engine.stop() }
         isPlaying = false
     }
 }

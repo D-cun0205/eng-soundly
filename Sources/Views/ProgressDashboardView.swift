@@ -21,7 +21,9 @@ struct ProgressDashboardView: View {
             } else {
                 Section {
                     ForEach(weak) { item in
-                        NavigationLink(value: item.phoneme) {
+                        NavigationLink {
+                            DrillSessionView(phoneme: item.phoneme)
+                        } label: {
                             phonemeRow(item)
                         }
                     }
@@ -39,9 +41,6 @@ struct ProgressDashboardView: View {
             }
         }
         .navigationTitle("내 발음 리포트")
-        .navigationDestination(for: String.self) { phoneme in
-            DrillSessionView(phoneme: phoneme)
-        }
     }
 
     @ViewBuilder

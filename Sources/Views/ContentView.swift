@@ -23,9 +23,6 @@ struct ContentView: View {
                         }
                     }
                 }
-                .navigationDestination(for: String.self) { word in
-                    PracticeView(word: word)
-                }
         }
     }
 }
@@ -51,7 +48,9 @@ struct WordCatalogView: View {
             ForEach(appModel.categories) { category in
                 Section {
                     ForEach(category.words) { entry in
-                        NavigationLink(value: entry.word) {
+                        NavigationLink {
+                            PracticeView(word: entry.word)
+                        } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(entry.word)
