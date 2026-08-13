@@ -1,0 +1,31 @@
+name: EngSoundly
+options:
+  bundleIdPrefix: ai.univs
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+targets:
+  EngSoundly:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Resources
+        buildPhase: resources
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: EngSoundly
+        UILaunchScreen: {}
+        NSMicrophoneUsageDescription: 발음을 녹음하고 분석하기 위해 마이크 접근이 필요합니다.
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        SUPPORTED_PLATFORMS: "iphonesimulator iphoneos"
+        PRODUCT_BUNDLE_IDENTIFIER: ai.univs.engsoundly
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: false
+        COREML_CODEGEN_LANGUAGE: None

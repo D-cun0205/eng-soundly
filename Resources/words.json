@@ -1,0 +1,137 @@
+[
+  {
+    "id": "r-l",
+    "title": "R과 L 구분",
+    "subtitle": "한국어 ㄹ에는 두 소리가 섞여 있어요",
+    "words": [
+      { "word": "rice", "meaning": "쌀, 밥", "contrast": "lice" },
+      { "word": "light", "meaning": "빛, 가벼운", "contrast": "right" },
+      { "word": "right", "meaning": "오른쪽, 옳은", "contrast": "light" },
+      { "word": "really", "meaning": "정말로", "contrast": null },
+      { "word": "world", "meaning": "세계", "contrast": null }
+    ]
+  },
+  {
+    "id": "f-p",
+    "title": "F와 P 구분",
+    "subtitle": "커피(coffee)의 F는 ㅍ이 아니에요",
+    "words": [
+      { "word": "fan", "meaning": "선풍기, 팬", "contrast": "pan" },
+      { "word": "coffee", "meaning": "커피", "contrast": "copy" },
+      { "word": "food", "meaning": "음식", "contrast": null },
+      { "word": "phone", "meaning": "전화", "contrast": null }
+    ]
+  },
+  {
+    "id": "v-b",
+    "title": "V와 B 구분",
+    "subtitle": "비디오(video)의 V는 ㅂ이 아니에요",
+    "words": [
+      { "word": "vote", "meaning": "투표하다", "contrast": "boat" },
+      { "word": "very", "meaning": "매우", "contrast": "berry" },
+      { "word": "video", "meaning": "비디오", "contrast": null },
+      { "word": "have", "meaning": "가지다", "contrast": null }
+    ]
+  },
+  {
+    "id": "th",
+    "title": "번데기 발음 (θ / ð)",
+    "subtitle": "혀끝을 이 사이에 — 씽크가 아니라 think",
+    "words": [
+      { "word": "think", "meaning": "생각하다", "contrast": "sink" },
+      { "word": "three", "meaning": "셋", "contrast": "tree" },
+      { "word": "mouth", "meaning": "입", "contrast": "mouse" },
+      { "word": "this", "meaning": "이것", "contrast": null },
+      { "word": "mother", "meaning": "어머니", "contrast": null }
+    ]
+  },
+  {
+    "id": "z-j",
+    "title": "Z 발음",
+    "subtitle": "주(zoo)가 아니라 zzz—oo",
+    "words": [
+      { "word": "zoo", "meaning": "동물원", "contrast": null },
+      { "word": "zero", "meaning": "영, 0", "contrast": null },
+      { "word": "busy", "meaning": "바쁜", "contrast": null },
+      { "word": "music", "meaning": "음악", "contrast": null }
+    ]
+  },
+  {
+    "id": "sh-s",
+    "title": "SH와 S 구분",
+    "subtitle": "she와 see는 다른 소리예요",
+    "words": [
+      { "word": "she", "meaning": "그녀", "contrast": "see" },
+      { "word": "sheet", "meaning": "시트, 장", "contrast": "seat" },
+      { "word": "ship", "meaning": "배", "contrast": "sip" },
+      { "word": "sea", "meaning": "바다", "contrast": "she" }
+    ]
+  },
+  {
+    "id": "ae-eh",
+    "title": "애와 에 (æ / ɛ)",
+    "subtitle": "bad와 bed — 턱을 여는 정도가 달라요",
+    "words": [
+      { "word": "bad", "meaning": "나쁜", "contrast": "bed" },
+      { "word": "bed", "meaning": "침대", "contrast": "bad" },
+      { "word": "man", "meaning": "남자", "contrast": "men" },
+      { "word": "apple", "meaning": "사과", "contrast": null }
+    ]
+  },
+  {
+    "id": "ih-ee",
+    "title": "긴장 '이'와 이완 '이' (i / ɪ)",
+    "subtitle": "ship과 sheep — 길이가 아니라 긴장도 차이",
+    "words": [
+      { "word": "sit", "meaning": "앉다", "contrast": "seat" },
+      { "word": "seat", "meaning": "좌석", "contrast": "sit" },
+      { "word": "fill", "meaning": "채우다", "contrast": "feel" },
+      { "word": "feel", "meaning": "느끼다", "contrast": "fill" }
+    ]
+  },
+  {
+    "id": "uh-oo",
+    "title": "긴장 '우'와 이완 '우' (u / ʊ)",
+    "subtitle": "full과 fool — 입술 모양이 달라요",
+    "words": [
+      { "word": "full", "meaning": "가득 찬", "contrast": "fool" },
+      { "word": "fool", "meaning": "바보", "contrast": "full" },
+      { "word": "pull", "meaning": "당기다", "contrast": "pool" },
+      { "word": "good", "meaning": "좋은", "contrast": null }
+    ]
+  },
+  {
+    "id": "cluster",
+    "title": "자음군 (모음 삽입 주의)",
+    "subtitle": "스트라이크(5음절)가 아니라 strike(1음절)",
+    "words": [
+      { "word": "strike", "meaning": "치다, 파업", "contrast": null },
+      { "word": "spring", "meaning": "봄, 용수철", "contrast": null },
+      { "word": "desk", "meaning": "책상", "contrast": null },
+      { "word": "milk", "meaning": "우유", "contrast": null },
+      { "word": "test", "meaning": "시험", "contrast": null }
+    ]
+  },
+  {
+    "id": "er",
+    "title": "R화 모음 (ɚ)",
+    "subtitle": "버드가 아니라 bird — 혀를 만 채로",
+    "words": [
+      { "word": "bird", "meaning": "새", "contrast": null },
+      { "word": "work", "meaning": "일하다", "contrast": "walk" },
+      { "word": "teacher", "meaning": "선생님", "contrast": null },
+      { "word": "first", "meaning": "첫째", "contrast": null }
+    ]
+  },
+  {
+    "id": "ng",
+    "title": "받침 ㅇ (ŋ)",
+    "subtitle": "singer에 g 소리를 붙이지 마세요",
+    "words": [
+      { "word": "sing", "meaning": "노래하다", "contrast": "sin" },
+      { "word": "thing", "meaning": "것, 물건", "contrast": "thin" },
+      { "word": "singer", "meaning": "가수", "contrast": null },
+      { "word": "morning", "meaning": "아침", "contrast": null }
+    ]
+  }
+]
