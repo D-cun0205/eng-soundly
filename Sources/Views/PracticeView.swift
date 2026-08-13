@@ -107,6 +107,7 @@ struct PracticeView: View {
                 return
             }
             do {
+                appModel.recorder.maxSeconds = 4.8   // single word: one model window
                 appModel.recorder.onAutoStop = {
                     Task { await finishRecording() }
                 }

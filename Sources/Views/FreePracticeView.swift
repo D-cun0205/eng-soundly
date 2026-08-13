@@ -163,6 +163,7 @@ struct FreePracticeView: View {
         }
         _ = await SpeechIntentService.requestPermission()   // best effort; ASR degrades gracefully
         do {
+            appModel.recorder.maxSeconds = 15    // sentences: segmented at recognition
             appModel.recorder.onAutoStop = {
                 Task { await finishRecording() }
             }

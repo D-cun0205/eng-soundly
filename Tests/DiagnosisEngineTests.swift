@@ -143,6 +143,103 @@ final class DiagnosisEngineTests: XCTestCase {
         XCTAssertFalse(normalized.contains { $0.contains("ː") })
     }
 
+    // MARK: - Sentence mode
+
+    private func sentenceTargets(_ pairs: [(String, [[String]])]) -> [WordTarget] {
+        pairs.map { WordTarget(word: $0.0, variants: $0.1) }
+    }
+
+    func testSentencePerWordScoresAndAttribution() {
+        // "rice light": rice said with r→l, light said perfectly.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("rice", [["ɹ", "aɪ", "s"]]),
+                ("light", [["l", "aɪ", "t"]]),
+            ]),
+            recognized: ["l", "aɪ", "s", "l", "aɪ", "t"], usedMock: false)
+
+        XCTAssertEqual(report.wordScores.count, 2)
+        XCTAssertLessThan(report.wordScores[0].score, 100)   // rice has the error
+        XCTAssertEqual(report.wordScores[1].score, 100)      // light is clean
+        XCTAssertEqual(report.issues.count, 1)
+        XCTAssertEqual(report.issues[0].word, "rice")        // attributed correctly
+    }
+
+    func testSentencePicksBestVariantPerWord() {
+        // "the" has ði/ðə variants; the speaker said ði — no error either way.
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("the", [["ð", "ə"], ["ð", "i"]]),
+                ("light", [["l", "aɪ", "t"]]),
+            ]),
+            recognized: ["ð", "i", "l", "aɪ", "t"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+    }
+
+    func testSentenceWordFinalVoicingLenientPerWord() {
+        // Voicing leniency applies at EVERY word's final position, not just
+        // the utterance end: "rice light" heard as [ɹ aɪ z][l aɪ d].
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("rice", [["ɹ", "aɪ", "s"]]),
+                ("light", [["l", "aɪ", "t"]]),
+            ]),
+            recognized: ["ɹ", "aɪ", "z", "l", "aɪ", "d"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+    }
+
+    func testSentenceFindsLateDictionaryVariant() {
+        // "to" is /tə/ in running speech — its THIRD dictionary form. The
+        // variant chooser must reach it (a capped cartesian product didn't).
+        let report = DiagnosisEngine.diagnose(
+            sentence: sentenceTargets([
+                ("want", [["w", "ɑ", "n", "t"]]),
+                ("to", [["t", "u"], ["t", "ɪ"], ["t", "ə"]]),
+                ("go", [["ɡ", "oʊ"]]),
+            ]),
+            recognized: ["w", "ɑ", "n", "t", "t", "ə", "ɡ", "oʊ"], usedMock: false)
+        XCTAssertEqual(report.score, 100)
+        XCTAssertTrue(report.issues.isEmpty)
+    }
+
+    func testFullVowelVsWedgeNotFlagged() {
+        // Native "want" comes back [w ʌ n t] against dictionary /w ɑ n t/.
+        let report = diagnose("want", target: ["w", "ɑ", "n", "t"],
+                              actual: ["w", "ʌ", "n", "t"])
+        XCTAssertTrue(report.issues.isEmpty)
+    }
+
+    func testSingleWordReportHasOneWordScore() {
+        let report = diagnose("sea", target: ["s", "i"], actual: ["s", "i"])
+        XCTAssertEqual(report.wordScores.count, 1)
+        XCTAssertNil(report.issues.first?.word)   // no word tags in word mode
+    }
+
+    // MARK: - Audio segmentation
+
+    func testSegmenterShortAudioUntouched() {
+        let audio = [Float](repeating: 0.1, count: 1_000)
+        let segments = AudioSegmenter.segment(audio, window: 80_000)
+        XCTAssertEqual(segments.count, 1)
+        XCTAssertEqual(segments[0].count, 1_000)
+    }
+
+    func testSegmenterCutsAtQuietestPointAndPreservesAllSamples() {
+        // 12 s of "speech" with a silent gap at 4.0–4.3 s: the first cut
+        // (search zone 3.0–5.0 s) must land inside the gap.
+        var audio = [Float](repeating: 0.3, count: 192_000)
+        for i in 64_000..<68_800 { audio[i] = 0 }
+        let segments = AudioSegmenter.segment(audio, window: 80_000)
+
+        XCTAssertGreaterThanOrEqual(segments.count, 2)
+        XCTAssertTrue((64_000...68_800).contains(segments[0].count),
+                      "first cut at \(segments[0].count), expected inside the silent gap")
+        XCTAssertTrue(segments.allSatisfy { $0.count <= 80_000 })
+        XCTAssertEqual(segments.reduce(0) { $0 + $1.count }, audio.count)
+    }
+
     // MARK: - Candidate ranking
 
     private let miniLexicon: [CandidateRanker.Entry] = [

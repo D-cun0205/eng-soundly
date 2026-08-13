@@ -87,20 +87,16 @@ final class AppModel: ObservableObject {
                           userInfo: [NSLocalizedDescriptionKey: "교정할 텍스트가 없습니다."])
         }
 
-        var variants: [[String]] = [[]]
-        for word in words {
+        let sentence: [WordTarget] = try words.map { word in
             let prons = dictionary.pronunciations(for: word)
             guard !prons.isEmpty else {
                 throw NSError(domain: "AppModel", code: 10,
                               userInfo: [NSLocalizedDescriptionKey: "사전에 없는 단어입니다: \(word)"])
             }
-            // Cartesian product of per-word variants, capped to keep it cheap.
-            let take = prons.prefix(words.count == 1 ? prons.count : 2)
-            variants = variants.flatMap { head in take.map { head + $0 } }
-            if variants.count > 8 { variants = Array(variants.prefix(8)) }
+            return WordTarget(word: word, variants: prons)
         }
 
-        return DiagnosisEngine.diagnose(word: text, variants: variants,
+        return DiagnosisEngine.diagnose(sentence: sentence, displayText: text,
                                         recognized: attempt.recognized.map(\.token),
                                         confidences: attempt.recognized.map(\.confidence),
                                         usedMock: !recognizer.isRealModel)

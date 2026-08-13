@@ -51,6 +51,32 @@ struct DiagnosisResultView: View {
                 .font(.caption2)
             }
 
+            // Per-word scores (sentence mode)
+            if report.wordScores.count > 1 {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("단어별 점수")
+                        .font(.headline)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(report.wordScores) { ws in
+                                VStack(spacing: 2) {
+                                    Text(ws.word)
+                                        .font(.subheadline.weight(.semibold))
+                                    Text("\(ws.score)")
+                                        .font(.caption.monospacedDigit())
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(wordScoreColor(ws.score).opacity(0.15),
+                                            in: RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10)
+                                    .stroke(wordScoreColor(ws.score).opacity(0.5), lineWidth: 1))
+                            }
+                        }
+                    }
+                }
+            }
+
             // A/B listening: own recording vs native reference
             HStack(spacing: 12) {
                 if let onPlayUserAudio {
@@ -90,7 +116,11 @@ struct DiagnosisResultView: View {
     }
 
     private var scoreColor: Color {
-        switch report.score {
+        wordScoreColor(report.score)
+    }
+
+    private func wordScoreColor(_ score: Int) -> Color {
+        switch score {
         case 85...: .green
         case 60..<85: .orange
         default: .red
@@ -141,6 +171,13 @@ struct DiagnosisResultView: View {
                 Text(issue.title)
                     .font(.subheadline.bold())
                 Spacer()
+                if let word = issue.word {
+                    Text(word)
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(.quaternary, in: Capsule())
+                }
                 if issue.isKnownKoreanPattern {
                     Text("한국인 패턴")
                         .font(.caption2)

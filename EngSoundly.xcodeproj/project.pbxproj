@@ -25,6 +25,7 @@
 		A90F8C2497511ACD31655DB6 /* WordEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248ED376D8CD5960455B50B9 /* WordEntry.swift */; };
 		AC0F09ACCBA98C8C61BED257 /* WordCandidateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372098F7D93878CC97CC72F7 /* WordCandidateService.swift */; };
 		B203A0E052B8A8EE8E8F1704 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E9866747DAC7BD1A9B9EB0 /* AppModel.swift */; };
+		B59B870375C2B6C28FB4D9DC /* AudioSegmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8A2C0BFF16420FAE9FFEF7 /* AudioSegmenter.swift */; };
 		BE93F548DE217246CB7B8D72 /* DiagnosisEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4B5E0A750D79D17CFE02B0 /* DiagnosisEngine.swift */; };
 		C0D2AF3C1BFA56785EC907D3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADF3FF8C3E289855F41B2AA /* ContentView.swift */; };
 		C58052A463F8F5614B9D17D1 /* PhonemeRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2735929A55627021D238765 /* PhonemeRecognizer.swift */; };
@@ -36,6 +37,7 @@
 
 /* Begin PBXFileReference section */
 		10E9866747DAC7BD1A9B9EB0 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		1F8A2C0BFF16420FAE9FFEF7 /* AudioSegmenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSegmenter.swift; sourceTree = "<group>"; };
 		248ED376D8CD5960455B50B9 /* WordEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordEntry.swift; sourceTree = "<group>"; };
 		372098F7D93878CC97CC72F7 /* WordCandidateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCandidateService.swift; sourceTree = "<group>"; };
 		377F69670EDE1743B2EBC76A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 		0CD061FD57F133A580C98992 /* Diagnosis */ = {
 			isa = PBXGroup;
 			children = (
+				1F8A2C0BFF16420FAE9FFEF7 /* AudioSegmenter.swift */,
 				6738C1E3D56D2E149285B281 /* CandidateRanker.swift */,
 				8E4B5E0A750D79D17CFE02B0 /* DiagnosisEngine.swift */,
 				AC62A7B3F278BB3020932989 /* KoreanL1Rules.swift */,
@@ -238,6 +241,7 @@
 			files = (
 				B203A0E052B8A8EE8E8F1704 /* AppModel.swift in Sources */,
 				307A4311961D487D7D844E4F /* AudioRecorder.swift in Sources */,
+				B59B870375C2B6C28FB4D9DC /* AudioSegmenter.swift in Sources */,
 				F044DFD70DA1FE00A6180B3B /* CandidateRanker.swift in Sources */,
 				C0D2AF3C1BFA56785EC907D3 /* ContentView.swift in Sources */,
 				BE93F548DE217246CB7B8D72 /* DiagnosisEngine.swift in Sources */,

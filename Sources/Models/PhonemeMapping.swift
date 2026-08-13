@@ -162,6 +162,10 @@ enum PhonemeMapping {
         // ɑ ↔ ɔ : cot–caught merger — most GA speakers (and the acoustic
         // model) realize dictionary /ɔ/ as [ɑ]; never flag this as an error.
         if Set([a, b]) == Set(["ɑ", "ɔ"]) { return 0.15 }
+        // ɑ ↔ ʌ : CMUdict writes full vowels where running speech (and the
+        // model) produces [ʌ] — native "want" came back as [w ʌ n t]. The
+        // model can't separate these reliably, so don't flag the pair.
+        if Set([a, b]) == Set(["ɑ", "ʌ"]) { return 0.2 }
 
         if fa.kind != fb.kind {
             // glide ↔ high vowel is plausible (w~u, j~i)

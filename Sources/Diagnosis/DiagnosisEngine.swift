@@ -8,6 +8,21 @@ struct DiagnosedIssue: Identifiable {
     let explanation: String
     let howToFix: String
     let isKnownKoreanPattern: Bool
+    /// The word this issue belongs to (sentence mode; nil for single words).
+    var word: String?
+}
+
+/// Per-word result inside a sentence attempt.
+struct WordScore: Identifiable {
+    let id = UUID()
+    let word: String
+    let score: Int          // 0…100
+}
+
+/// One word of a sentence target with its pronunciation variants.
+struct WordTarget {
+    let word: String
+    let variants: [[String]]
 }
 
 /// Full result of one practice attempt.
@@ -19,6 +34,8 @@ struct DiagnosisReport {
     let issues: [DiagnosedIssue]
     let score: Int          // 0…100
     let usedMockRecognizer: Bool
+    /// Per-word breakdown; more than one entry only in sentence mode.
+    var wordScores: [WordScore] = []
 }
 
 enum DiagnosisEngine {
@@ -28,27 +45,76 @@ enum DiagnosisEngine {
     /// worse than a missed one.
     static let confidenceGate: Float = 0.45
 
-    /// Diagnose against all pronunciation variants; keep the closest one.
+    /// Diagnose a single word against all its pronunciation variants.
     /// `confidences[i]` (optional) is the model's confidence in `recognized[i]`.
     static func diagnose(word: String,
                          variants: [[String]],
                          recognized: [String],
                          confidences: [Float]? = nil,
                          usedMock: Bool) -> DiagnosisReport {
-        let target = variants.min {
-            PhonemeAligner.normalizedCost(target: $0, actual: recognized)
-                < PhonemeAligner.normalizedCost(target: $1, actual: recognized)
-        } ?? []
+        diagnose(sentence: [WordTarget(word: word, variants: variants)],
+                 displayText: word, recognized: recognized,
+                 confidences: confidences, usedMock: usedMock)
+    }
+
+    /// Diagnose a sentence: one WordTarget per word, in order. The target is
+    /// the best-matching combination of per-word variants; every op is
+    /// attributed to a word so the report carries per-word scores.
+    static func diagnose(sentence: [WordTarget],
+                         displayText: String? = nil,
+                         recognized: [String],
+                         confidences: [Float]? = nil,
+                         usedMock: Bool) -> DiagnosisReport {
+        // Pick the pronunciation variant per word by coordinate descent:
+        // start from every word's primary form, then repeatedly swap in the
+        // single alternate that lowers the whole-utterance alignment cost.
+        // Unlike enumerating combinations this never truncates a word's
+        // variant list ("to" really is /tə/ in running speech — its third
+        // dictionary form), and it costs O(variants · passes) alignments.
+        var bestCombo = sentence.map { $0.variants.first ?? [] }
+        var bestCost = PhonemeAligner.normalizedCost(target: bestCombo.flatMap { $0 },
+                                                     actual: recognized)
+        for _ in 0..<3 {
+            var improved = false
+            for (w, wt) in sentence.enumerated() where wt.variants.count > 1 {
+                for variant in wt.variants.dropFirst() {
+                    var trial = bestCombo
+                    trial[w] = variant
+                    let cost = PhonemeAligner.normalizedCost(target: trial.flatMap { $0 },
+                                                             actual: recognized)
+                    if cost < bestCost {
+                        bestCombo = trial
+                        bestCost = cost
+                        improved = true
+                    }
+                }
+            }
+            if !improved { break }
+        }
+
+        // Word boundaries inside the flattened target.
+        var ranges: [Range<Int>] = []
+        var pos = 0
+        for wordPhonemes in bestCombo {
+            ranges.append(pos..<(pos + wordPhonemes.count))
+            pos += wordPhonemes.count
+        }
+        let target = bestCombo.flatMap { $0 }
+        let wordFinalIdxs = Set(ranges.compactMap { $0.isEmpty ? nil : $0.upperBound - 1 })
+
+        func wordIndex(forTargetIdx t: Int) -> Int {
+            ranges.firstIndex { $0.contains(t) } ?? max(0, sentence.count - 1)
+        }
 
         let ops = PhonemeAligner.align(target: target, actual: recognized)
         var issues: [DiagnosedIssue] = []
-        var penalty = 0.0
+        var wordPenalties = [Double](repeating: 0, count: sentence.count)
 
-        let lastTargetIdx = ops.lastIndex(where: { $0.target != nil })
+        var tIdx = -1      // index into `target` for ops that consume a target phoneme
+        var actualIdx = -1 // index into `recognized` for ops that consume a token
 
-        var actualIdx = -1   // index into `recognized` for ops that consume a token
-
-        for (idx, op) in ops.enumerated() {
+        for op in ops {
+            if op.target != nil { tIdx += 1 }
             if op.actual != nil { actualIdx += 1 }
             guard op.kind != .match else { continue }
 
@@ -63,43 +129,61 @@ enum DiagnosisEngine {
 
             // Word-final voicing-only mismatch (s/z, t/d…): the model can't
             // hear final voicing reliably — skip rather than risk a false flag.
-            if op.kind == .substitute, idx == lastTargetIdx,
+            if op.kind == .substitute, wordFinalIdxs.contains(tIdx),
                let t = op.target, let a = op.actual,
                PhonemeMapping.isVoicingOnlyPair(t, a) { continue }
+
+            // Attribute the op to a word: by target position, or for pure
+            // insertions to the word of the last consumed target phoneme.
+            let wordIdx = wordIndex(forTargetIdx: max(tIdx, 0))
+            let wordLabel = sentence.count > 1 ? sentence[wordIdx].word : nil
 
             switch op.kind {
             case .substitute:
                 let c = PhonemeMapping.substitutionCost(op.target ?? "", op.actual ?? "")
-                penalty += min(c / 1.8, 1.0)
+                wordPenalties[wordIdx] += min(c / 1.8, 1.0)
             case .delete, .insert:
-                penalty += 0.8
+                wordPenalties[wordIdx] += 0.8
             case .match:
                 break
             }
 
+            // Word-final vowel epenthesis gets the more specific explanation.
+            let isWordFinalContext = tIdx < 0 || wordFinalIdxs.contains(tIdx)
             if let rule = KoreanL1Rules.match(op) {
-                // Word-final vowel epenthesis gets the more specific explanation.
-                if rule.id == "vowel-epenthesis", idx == ops.count - 1,
+                if rule.id == "vowel-epenthesis", isWordFinalContext, op.kind == .insert,
                    let finalRelease = KoreanL1Rules.all.first(where: { $0.id == "final-release" }) {
                     issues.append(DiagnosedIssue(op: op, title: finalRelease.title,
                                                  explanation: finalRelease.explanation,
                                                  howToFix: finalRelease.howToFix,
-                                                 isKnownKoreanPattern: true))
+                                                 isKnownKoreanPattern: true, word: wordLabel))
                 } else {
                     issues.append(DiagnosedIssue(op: op, title: rule.title,
                                                  explanation: rule.explanation,
                                                  howToFix: rule.howToFix,
-                                                 isKnownKoreanPattern: true))
+                                                 isKnownKoreanPattern: true, word: wordLabel))
                 }
             } else {
-                issues.append(genericIssue(for: op))
+                var issue = genericIssue(for: op)
+                issue.word = wordLabel
+                issues.append(issue)
             }
         }
 
-        let score = target.isEmpty ? 0
-            : Int((max(0.0, 1.0 - penalty / Double(target.count)) * 100).rounded())
-        return DiagnosisReport(word: word, targetIPA: target, recognizedIPA: recognized,
-                               ops: ops, issues: issues, score: score, usedMockRecognizer: usedMock)
+        func scoreFrom(penalty: Double, count: Int) -> Int {
+            guard count > 0 else { return 0 }
+            return Int((max(0.0, 1.0 - penalty / Double(count)) * 100).rounded())
+        }
+
+        let wordScores = zip(sentence, zip(ranges, wordPenalties)).map { wt, rp in
+            WordScore(word: wt.word, score: scoreFrom(penalty: rp.1, count: rp.0.count))
+        }
+        let score = scoreFrom(penalty: wordPenalties.reduce(0, +), count: target.count)
+        let title = displayText ?? sentence.map(\.word).joined(separator: " ")
+
+        return DiagnosisReport(word: title, targetIPA: target, recognizedIPA: recognized,
+                               ops: ops, issues: issues, score: score,
+                               usedMockRecognizer: usedMock, wordScores: wordScores)
     }
 
     private static func genericIssue(for op: PhonemeOp) -> DiagnosedIssue {

@@ -71,9 +71,27 @@ final class CoreMLPhonemeRecognizer: PhonemeRecognizer {
         _ = try? await recognize(samples: [Float](repeating: 0, count: 80_000), targetHint: [])
     }
 
+    /// The model's input window: 5 s at 16 kHz.
+    private static let window = 80_000
+
     func recognize(samples: [Float], targetHint: [String]) async throws -> [RecognizedPhoneme] {
         guard !samples.isEmpty else { return [] }
 
+        // Long recordings (sentences) are split at silence boundaries into
+        // window-sized segments, recognized independently, and concatenated.
+        // Keeping every Core ML input exactly `window` long avoids per-shape
+        // Neural Engine recompiles.
+        if samples.count > Self.window {
+            var result: [RecognizedPhoneme] = []
+            for segment in AudioSegmenter.segment(samples, window: Self.window) {
+                result += try await recognizeWindow(segment)
+            }
+            return result
+        }
+        return try await recognizeWindow(samples)
+    }
+
+    private func recognizeWindow(_ samples: [Float]) async throws -> [RecognizedPhoneme] {
         // wav2vec2 expects zero-mean / unit-variance input.
         var x = samples
         let mean = x.reduce(0, +) / Float(x.count)
@@ -84,7 +102,7 @@ final class CoreMLPhonemeRecognizer: PhonemeRecognizer {
         // Always pad/trim to one canonical length, even with a flexible-shape
         // model: each distinct input shape triggers a fresh (slow) compile on
         // the Neural Engine, so we keep the shape constant across calls.
-        let canonical = fixedInputLength ?? 80_000
+        let canonical = fixedInputLength ?? Self.window
         if x.count < canonical { x.append(contentsOf: [Float](repeating: 0, count: canonical - x.count)) }
         if x.count > canonical { x = Array(x.prefix(canonical)) }
 

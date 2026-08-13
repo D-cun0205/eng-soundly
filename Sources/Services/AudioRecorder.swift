@@ -23,7 +23,10 @@ final class AudioRecorder: ObservableObject {
     private static let speechRMS: Float = 0.02
     private static let silenceRMS: Float = 0.01
     private static let trailingSilenceSamples = 14_400   // 0.9 s
-    private static let maxSamples = 76_800               // 4.8 s (model window is 5 s)
+
+    /// Hard cap per recording. Word practice keeps this within the model's
+    /// 5 s window; free-form mode allows sentences (segmented at recognition).
+    var maxSeconds: Double = 15
 
     func requestPermission() async -> Bool {
         await AVAudioApplication.requestRecordPermission()
@@ -79,7 +82,7 @@ final class AudioRecorder: ObservableObject {
                     self.silenceSampleRun += chunk.count
                 }
                 let trailedOff = self.heardSpeech && self.silenceSampleRun >= Self.trailingSilenceSamples
-                if trailedOff || self.samples.count >= Self.maxSamples {
+                if trailedOff || self.samples.count >= Int(self.maxSeconds * Self.sampleRate) {
                     self.onAutoStop?()
                 }
             }
