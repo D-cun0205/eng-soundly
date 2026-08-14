@@ -75,9 +75,18 @@ final class AppModel: ObservableObject {
 
         // The context box must always open with our best guess filled in —
         // the chips are for correcting it, not for assembling it. If ASR
-        // gave nothing, promote the top sound-alike candidate to the box.
-        if text.isEmpty, !suggestions.isEmpty {
-            text = suggestions.removeFirst()
+        // gave nothing, reconstruct the utterance from the phonemes alone:
+        // word segmentation first (handles sentences AND single words),
+        // then the top sound-alike candidate as a last resort.
+        if text.isEmpty {
+            let tokens = recognized.map(\.token)
+            if let guessed = await Task.detached(priority: .userInitiated) { [candidates] in
+                candidates.guessSentence(for: tokens)
+            }.value {
+                text = guessed
+            } else if !suggestions.isEmpty {
+                text = suggestions.removeFirst()
+            }
         }
 
         return FreeAttempt(samples: samples, recognized: recognized,

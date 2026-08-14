@@ -361,6 +361,38 @@ final class DiagnosisEngineTests: XCTestCase {
         XCTAssertEqual(words, ["think", "birthday"])   // frequency order, θ only
     }
 
+    // MARK: - Phoneme segmentation (ASR-free sentence guessing)
+
+    private let segLexicon: [CandidateRanker.Entry] = [
+        .init(word: "there", rank: 50, variants: [["ð", "ɛ", "ɹ"]]),
+        .init(word: "is", rank: 10, variants: [["ɪ", "z"]]),
+        .init(word: "no", rank: 30, variants: [["n", "oʊ"]]),
+        .init(word: "reason", rank: 400, variants: [["ɹ", "i", "z", "ə", "n"]]),
+        .init(word: "day", rank: 80, variants: [["d", "eɪ"]]),
+        .init(word: "knows", rank: 900, variants: [["n", "oʊ", "z"]]),
+        .init(word: "strike", rank: 2_000, variants: [["s", "t", "ɹ", "aɪ", "k"]]),
+    ]
+
+    func testSegmenterReconstructsSentence() {
+        let words = PhonemeSegmenter.segment(
+            ["ð", "ɛ", "ɹ", "ɪ", "z", "n", "oʊ", "ɹ", "i", "z", "ə", "n"],
+            lexicon: segLexicon)
+        XCTAssertEqual(words, ["there", "is", "no", "reason"])
+    }
+
+    func testSegmenterHandlesSingleWord() {
+        let words = PhonemeSegmenter.segment(["s", "t", "ɹ", "aɪ", "k"],
+                                             lexicon: segLexicon)
+        XCTAssertEqual(words, ["strike"])
+    }
+
+    func testSegmenterRejectsGarbage() {
+        // Nothing in the vocabulary sounds like this — no hallucinated guess.
+        let words = PhonemeSegmenter.segment(["f", "f", "f", "k", "k", "k", "f", "f"],
+                                             lexicon: segLexicon)
+        XCTAssertNil(words)
+    }
+
     // MARK: - Audio segmentation
 
     func testSegmenterShortAudioUntouched() {

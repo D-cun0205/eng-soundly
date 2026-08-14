@@ -36,4 +36,11 @@ final class WordCandidateService {
     func drillWords(for phoneme: String, limit: Int = 8) -> [String] {
         DrillBuilder.words(containing: phoneme, lexicon: lexicon, limit: limit)
     }
+
+    /// ASR-free sentence guess: segments the phoneme stream into common
+    /// dictionary words. Returns nil when nothing explains the audio well.
+    func guessSentence(for recognized: [String]) -> String? {
+        PhonemeSegmenter.segment(recognized, lexicon: lexicon)?
+            .joined(separator: " ")
+    }
 }
