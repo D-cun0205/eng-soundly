@@ -69,9 +69,16 @@ final class AppModel: ObservableObject {
                 candidates.candidates(for: tokens)
             }.value
         }
-        let text = intentResult?.text ?? ""
+        var text = intentResult?.text ?? ""
         var seen = Set([text])
-        let suggestions = pool.filter { seen.insert($0).inserted }
+        var suggestions = pool.filter { seen.insert($0).inserted }
+
+        // The context box must always open with our best guess filled in —
+        // the chips are for correcting it, not for assembling it. If ASR
+        // gave nothing, promote the top sound-alike candidate to the box.
+        if text.isEmpty, !suggestions.isEmpty {
+            text = suggestions.removeFirst()
+        }
 
         return FreeAttempt(samples: samples, recognized: recognized,
                            intentText: text, suggestions: Array(suggestions.prefix(6)))
