@@ -28,11 +28,19 @@ struct FreePracticeView: View {
                 }
 
                 if phase == .idle && attempt == nil {
-                    Spacer(minLength: 60)
-                    Text("궁금한 단어나 문장을 말해 보세요")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
+                    Spacer(minLength: 48)
+                    VStack(spacing: 14) {
+                        Image(systemName: "waveform")
+                            .font(.system(size: 44, weight: .medium))
+                            .foregroundStyle(Theme.heroGradient)
+                        Text("궁금한 단어나 문장을 말해 보세요")
+                            .font(.title3.weight(.medium))
+                        Text("발음을 듣고 원어민과 어디가 다른지 알려드려요")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .multilineTextAlignment(.center)
+                    Spacer(minLength: 12)
                 }
 
                 micButton
@@ -123,25 +131,12 @@ struct FreePracticeView: View {
     // MARK: - Mic
 
     private var micButton: some View {
-        Button {
+        MicButton(isRecording: phase == .recording,
+                  level: appModel.recorder.level,
+                  size: 96) {
             Task { await toggleRecording() }
-        } label: {
-            ZStack {
-                Circle()
-                    .fill(phase == .recording ? Color.red : Color.accentColor)
-                    .frame(width: 96, height: 96)
-                    .scaleEffect(phase == .recording
-                                 ? 1.0 + CGFloat(min(appModel.recorder.level * 6, 0.35))
-                                 : 1.0)
-                    .animation(.easeOut(duration: 0.12), value: appModel.recorder.level)
-                Image(systemName: phase == .recording ? "stop.fill" : "mic.fill")
-                    .font(.system(size: 38))
-                    .foregroundStyle(.white)
-            }
         }
-        .buttonStyle(.plain)
         .disabled(phase == .processing || phase == .diagnosing)
-        .accessibilityLabel(phase == .recording ? "녹음 중지" : "녹음 시작")
     }
 
     // MARK: - Flow

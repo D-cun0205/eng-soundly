@@ -14,6 +14,10 @@ targets:
         buildPhase: resources
         excludes:
           - "PhonemeCTC.mlpackage"
+          # actool is broken on this machine (SDK/runtime mismatch) — icons
+          # ship as plain PNGs via CFBundleIcons instead. Restore the asset
+          # catalog when building for App Store on a healthy Xcode install.
+          - "Assets.xcassets"
       # Core ML model compiles to .mlmodelc at build time via the sources phase
       - path: Resources/PhonemeCTC.mlpackage
         buildPhase: sources
@@ -24,6 +28,10 @@ targets:
         UILaunchScreen: {}
         NSMicrophoneUsageDescription: 발음을 녹음하고 분석하기 위해 마이크 접근이 필요합니다.
         NSSpeechRecognitionUsageDescription: 말한 단어와 문장을 알아듣기 위해 음성 인식이 필요합니다.
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleIconFiles:
+              - AppIcon
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
     settings:

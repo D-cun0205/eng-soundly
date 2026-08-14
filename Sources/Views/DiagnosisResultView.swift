@@ -1,5 +1,39 @@
 import SwiftUI
 
+/// Circular score gauge with the number inside; animates on appear.
+struct ScoreRing: View {
+    let score: Int
+    let color: Color
+
+    @State private var progress: Double = 0
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(.quaternary, lineWidth: 9)
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(color, style: StrokeStyle(lineWidth: 9, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            VStack(spacing: 0) {
+                Text("\(score)")
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .foregroundStyle(color)
+                    .contentTransition(.numericText())
+                Text("점")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(width: 84, height: 84)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.7)) {
+                progress = Double(score) / 100
+            }
+        }
+    }
+}
+
 struct DiagnosisResultView: View {
     let report: DiagnosisReport
     let onPlayReference: () -> Void
@@ -8,17 +42,15 @@ struct DiagnosisResultView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             // Score header
-            HStack {
-                VStack(alignment: .leading) {
+            HStack(spacing: 16) {
+                ScoreRing(score: report.score, color: scoreColor)
+                VStack(alignment: .leading, spacing: 2) {
                     Text("발음 점수")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("\(report.score)")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
-                        .foregroundStyle(scoreColor)
-                    + Text(" / 100")
+                    Text(scoreLabel)
                         .font(.headline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(scoreColor)
                 }
                 Spacer()
                 if report.usedMockRecognizer {
@@ -143,6 +175,15 @@ struct DiagnosisResultView: View {
 
     private var scoreColor: Color {
         wordScoreColor(report.score)
+    }
+
+    private var scoreLabel: String {
+        switch report.score {
+        case 95...: "완벽에 가까워요!"
+        case 85..<95: "아주 좋아요"
+        case 60..<85: "조금만 더 다듬어요"
+        default: "천천히 다시 해봐요"
+        }
     }
 
     private func wordScoreColor(_ score: Int) -> Color {

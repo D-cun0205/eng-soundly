@@ -140,25 +140,12 @@ struct PracticeView: View {
     }
 
     private var recordButton: some View {
-        Button {
+        MicButton(isRecording: appModel.recorder.isRecording,
+                  level: appModel.recorder.level,
+                  size: 88) {
             Task { await toggleRecording() }
-        } label: {
-            ZStack {
-                Circle()
-                    .fill(appModel.recorder.isRecording ? Color.red : Color.accentColor)
-                    .frame(width: 88, height: 88)
-                    .scaleEffect(appModel.recorder.isRecording
-                                 ? 1.0 + CGFloat(min(appModel.recorder.level * 6, 0.35))
-                                 : 1.0)
-                    .animation(.easeOut(duration: 0.12), value: appModel.recorder.level)
-                Image(systemName: appModel.recorder.isRecording ? "stop.fill" : "mic.fill")
-                    .font(.system(size: 34))
-                    .foregroundStyle(.white)
-            }
         }
-        .buttonStyle(.plain)
         .disabled(isProcessing)
-        .accessibilityLabel(appModel.recorder.isRecording ? "녹음 중지" : "녹음 시작")
     }
 
     private func toggleRecording() async {

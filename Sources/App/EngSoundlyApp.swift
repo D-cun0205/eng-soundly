@@ -8,6 +8,7 @@ struct EngSoundlyApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(appModel)
+                .tint(Theme.accent)
         }
     }
 }
