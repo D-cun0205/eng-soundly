@@ -22,7 +22,7 @@ final class AudioRecorder: ObservableObject {
     private var silenceSampleRun = 0
     private static let speechRMS: Float = 0.02
     private static let silenceRMS: Float = 0.01
-    private static let trailingSilenceSamples = 14_400   // 0.9 s
+    private static let trailingSilenceSamples = 24_000   // 1.5 s
 
     /// Hard cap per recording. Word practice keeps this within the model's
     /// 5 s window; free-form mode allows sentences (segmented at recognition).

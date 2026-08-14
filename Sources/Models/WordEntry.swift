@@ -11,10 +11,11 @@ struct WordCategory: Identifiable, Decodable {
 struct WordEntry: Identifiable, Decodable {
     var id: String { word }
     let word: String
-    let meaning: String      // Korean gloss
-    let contrast: String?    // minimal-pair partner, if any
+    let meaning: String              // Korean gloss
+    let contrast: String?            // minimal-pair partner, if any
+    let contrastMeaning: String?     // Korean gloss of the partner
 
-    enum CodingKeys: String, CodingKey { case word, meaning, contrast }
+    enum CodingKeys: String, CodingKey { case word, meaning, contrast, contrastMeaning }
 }
 
 enum WordCatalog {

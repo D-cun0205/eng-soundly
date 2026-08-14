@@ -49,7 +49,9 @@ struct WordCatalogView: View {
                 Section {
                     ForEach(category.words) { entry in
                         NavigationLink {
-                            PracticeView(word: entry.word)
+                            PracticeView(word: entry.word,
+                                         contrast: entry.contrast,
+                                         contrastMeaning: entry.contrastMeaning)
                         } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {

@@ -4,13 +4,46 @@
     "title": "R과 L 구분",
     "subtitle": "한국어 ㄹ에는 두 소리가 섞여 있어요",
     "words": [
-      { "word": "rice", "meaning": "쌀, 밥", "contrast": "lice" },
-      { "word": "light", "meaning": "빛, 가벼운", "contrast": "right" },
-      { "word": "right", "meaning": "오른쪽, 옳은", "contrast": "light" },
-      { "word": "really", "meaning": "정말로", "contrast": null },
-      { "word": "world", "meaning": "세계", "contrast": null },
-      { "word": "road", "meaning": "길, 도로", "contrast": "load" },
-      { "word": "play", "meaning": "놀다, 연주하다", "contrast": "pray" }
+      {
+        "word": "rice",
+        "meaning": "쌀, 밥",
+        "contrast": "lice",
+        "contrastMeaning": "머릿니"
+      },
+      {
+        "word": "light",
+        "meaning": "빛, 가벼운",
+        "contrast": "right",
+        "contrastMeaning": "오른쪽, 옳은"
+      },
+      {
+        "word": "right",
+        "meaning": "오른쪽, 옳은",
+        "contrast": "light",
+        "contrastMeaning": "빛, 가벼운"
+      },
+      {
+        "word": "really",
+        "meaning": "정말로",
+        "contrast": null
+      },
+      {
+        "word": "world",
+        "meaning": "세계",
+        "contrast": null
+      },
+      {
+        "word": "road",
+        "meaning": "길, 도로",
+        "contrast": "load",
+        "contrastMeaning": "짐, 싣다"
+      },
+      {
+        "word": "play",
+        "meaning": "놀다, 연주하다",
+        "contrast": "pray",
+        "contrastMeaning": "기도하다"
+      }
     ]
   },
   {
@@ -18,12 +51,40 @@
     "title": "F와 P 구분",
     "subtitle": "커피(coffee)의 F는 ㅍ이 아니에요",
     "words": [
-      { "word": "fan", "meaning": "선풍기, 팬", "contrast": "pan" },
-      { "word": "coffee", "meaning": "커피", "contrast": "copy" },
-      { "word": "food", "meaning": "음식", "contrast": null },
-      { "word": "phone", "meaning": "전화", "contrast": null },
-      { "word": "fine", "meaning": "좋은, 벌금", "contrast": "pine" },
-      { "word": "feel", "meaning": "느끼다", "contrast": "peel" }
+      {
+        "word": "fan",
+        "meaning": "선풍기, 팬",
+        "contrast": "pan",
+        "contrastMeaning": "냄비, 팬"
+      },
+      {
+        "word": "coffee",
+        "meaning": "커피",
+        "contrast": "copy",
+        "contrastMeaning": "복사"
+      },
+      {
+        "word": "food",
+        "meaning": "음식",
+        "contrast": null
+      },
+      {
+        "word": "phone",
+        "meaning": "전화",
+        "contrast": null
+      },
+      {
+        "word": "fine",
+        "meaning": "좋은, 벌금",
+        "contrast": "pine",
+        "contrastMeaning": "소나무"
+      },
+      {
+        "word": "feel",
+        "meaning": "느끼다",
+        "contrast": "peel",
+        "contrastMeaning": "껍질을 벗기다"
+      }
     ]
   },
   {
@@ -31,13 +92,45 @@
     "title": "TH 발음 (θ/ð)",
     "subtitle": "혀끝을 이 사이에 — ㅆ도 ㄸ도 아니에요",
     "words": [
-      { "word": "think", "meaning": "생각하다", "contrast": "sink" },
-      { "word": "three", "meaning": "셋", "contrast": "tree" },
-      { "word": "thank", "meaning": "감사하다", "contrast": "sank" },
-      { "word": "bath", "meaning": "목욕", "contrast": null },
-      { "word": "this", "meaning": "이것", "contrast": null },
-      { "word": "mother", "meaning": "어머니", "contrast": null },
-      { "word": "they", "meaning": "그들", "contrast": "day" }
+      {
+        "word": "think",
+        "meaning": "생각하다",
+        "contrast": "sink",
+        "contrastMeaning": "가라앉다, 싱크대"
+      },
+      {
+        "word": "three",
+        "meaning": "셋",
+        "contrast": "tree",
+        "contrastMeaning": "나무"
+      },
+      {
+        "word": "thank",
+        "meaning": "감사하다",
+        "contrast": "sank",
+        "contrastMeaning": "가라앉았다"
+      },
+      {
+        "word": "bath",
+        "meaning": "목욕",
+        "contrast": null
+      },
+      {
+        "word": "this",
+        "meaning": "이것",
+        "contrast": null
+      },
+      {
+        "word": "mother",
+        "meaning": "어머니",
+        "contrast": null
+      },
+      {
+        "word": "they",
+        "meaning": "그들",
+        "contrast": "day",
+        "contrastMeaning": "날, 하루"
+      }
     ]
   },
   {
@@ -45,12 +138,38 @@
     "title": "V와 B 구분",
     "subtitle": "V는 윗니를 아랫입술에 — ㅂ이 아니에요",
     "words": [
-      { "word": "very", "meaning": "매우", "contrast": "berry" },
-      { "word": "vote", "meaning": "투표하다", "contrast": "boat" },
-      { "word": "video", "meaning": "영상", "contrast": null },
-      { "word": "love", "meaning": "사랑", "contrast": null },
-      { "word": "seven", "meaning": "일곱", "contrast": null },
-      { "word": "movie", "meaning": "영화", "contrast": null }
+      {
+        "word": "very",
+        "meaning": "매우",
+        "contrast": "berry",
+        "contrastMeaning": "딸기류 열매"
+      },
+      {
+        "word": "vote",
+        "meaning": "투표하다",
+        "contrast": "boat",
+        "contrastMeaning": "배, 보트"
+      },
+      {
+        "word": "video",
+        "meaning": "영상",
+        "contrast": null
+      },
+      {
+        "word": "love",
+        "meaning": "사랑",
+        "contrast": null
+      },
+      {
+        "word": "seven",
+        "meaning": "일곱",
+        "contrast": null
+      },
+      {
+        "word": "movie",
+        "meaning": "영화",
+        "contrast": null
+      }
     ]
   },
   {
@@ -58,12 +177,36 @@
     "title": "Z 발음",
     "subtitle": "zoo는 '주'가 아니라 벌소리 나는 '즈-'예요",
     "words": [
-      { "word": "zoo", "meaning": "동물원", "contrast": null },
-      { "word": "zero", "meaning": "영, 0", "contrast": null },
-      { "word": "busy", "meaning": "바쁜", "contrast": null },
-      { "word": "music", "meaning": "음악", "contrast": null },
-      { "word": "cousin", "meaning": "사촌", "contrast": null },
-      { "word": "amazing", "meaning": "놀라운", "contrast": null }
+      {
+        "word": "zoo",
+        "meaning": "동물원",
+        "contrast": null
+      },
+      {
+        "word": "zero",
+        "meaning": "영, 0",
+        "contrast": null
+      },
+      {
+        "word": "busy",
+        "meaning": "바쁜",
+        "contrast": null
+      },
+      {
+        "word": "music",
+        "meaning": "음악",
+        "contrast": null
+      },
+      {
+        "word": "cousin",
+        "meaning": "사촌",
+        "contrast": null
+      },
+      {
+        "word": "amazing",
+        "meaning": "놀라운",
+        "contrast": null
+      }
     ]
   },
   {
@@ -71,12 +214,38 @@
     "title": "SH와 S 구분",
     "subtitle": "she와 see가 같게 들리면 안 돼요",
     "words": [
-      { "word": "she", "meaning": "그녀", "contrast": "see" },
-      { "word": "sheet", "meaning": "시트, 종이 한 장", "contrast": "seat" },
-      { "word": "shop", "meaning": "가게", "contrast": null },
-      { "word": "wash", "meaning": "씻다", "contrast": null },
-      { "word": "fish", "meaning": "물고기", "contrast": null },
-      { "word": "sure", "meaning": "확실한", "contrast": null }
+      {
+        "word": "she",
+        "meaning": "그녀",
+        "contrast": "see",
+        "contrastMeaning": "보다"
+      },
+      {
+        "word": "sheet",
+        "meaning": "시트, 종이 한 장",
+        "contrast": "seat",
+        "contrastMeaning": "자리, 좌석"
+      },
+      {
+        "word": "shop",
+        "meaning": "가게",
+        "contrast": null
+      },
+      {
+        "word": "wash",
+        "meaning": "씻다",
+        "contrast": null
+      },
+      {
+        "word": "fish",
+        "meaning": "물고기",
+        "contrast": null
+      },
+      {
+        "word": "sure",
+        "meaning": "확실한",
+        "contrast": null
+      }
     ]
   },
   {
@@ -84,10 +253,30 @@
     "title": "짧은 i와 긴 ee",
     "subtitle": "ship과 sheep은 길이가 아니라 소리 자체가 달라요",
     "words": [
-      { "word": "ship", "meaning": "배", "contrast": "sheep" },
-      { "word": "sit", "meaning": "앉다", "contrast": "seat" },
-      { "word": "hit", "meaning": "치다", "contrast": "heat" },
-      { "word": "fill", "meaning": "채우다", "contrast": "feel" }
+      {
+        "word": "ship",
+        "meaning": "배",
+        "contrast": "sheep",
+        "contrastMeaning": "양"
+      },
+      {
+        "word": "sit",
+        "meaning": "앉다",
+        "contrast": "seat",
+        "contrastMeaning": "자리, 좌석"
+      },
+      {
+        "word": "hit",
+        "meaning": "치다",
+        "contrast": "heat",
+        "contrastMeaning": "열, 더위"
+      },
+      {
+        "word": "fill",
+        "meaning": "채우다",
+        "contrast": "feel",
+        "contrastMeaning": "느끼다"
+      }
     ]
   },
   {
@@ -95,11 +284,34 @@
     "title": "æ와 e 구분",
     "subtitle": "bad와 bed — 애보다 입을 더 크게 벌려요",
     "words": [
-      { "word": "bad", "meaning": "나쁜", "contrast": "bed" },
-      { "word": "man", "meaning": "남자", "contrast": "men" },
-      { "word": "sad", "meaning": "슬픈", "contrast": "said" },
-      { "word": "hat", "meaning": "모자", "contrast": null },
-      { "word": "apple", "meaning": "사과", "contrast": null }
+      {
+        "word": "bad",
+        "meaning": "나쁜",
+        "contrast": "bed",
+        "contrastMeaning": "침대"
+      },
+      {
+        "word": "man",
+        "meaning": "남자",
+        "contrast": "men",
+        "contrastMeaning": "남자들"
+      },
+      {
+        "word": "sad",
+        "meaning": "슬픈",
+        "contrast": "said",
+        "contrastMeaning": "말했다"
+      },
+      {
+        "word": "hat",
+        "meaning": "모자",
+        "contrast": null
+      },
+      {
+        "word": "apple",
+        "meaning": "사과",
+        "contrast": null
+      }
     ]
   },
   {
@@ -107,13 +319,41 @@
     "title": "자음군 — '으'를 넣지 마세요",
     "subtitle": "strike는 1음절, 스트라이크는 5음절",
     "words": [
-      { "word": "strike", "meaning": "치다, 파업", "contrast": null },
-      { "word": "spring", "meaning": "봄, 용수철", "contrast": null },
-      { "word": "street", "meaning": "거리", "contrast": null },
-      { "word": "desk", "meaning": "책상", "contrast": null },
-      { "word": "milk", "meaning": "우유", "contrast": null },
-      { "word": "strong", "meaning": "강한", "contrast": null },
-      { "word": "test", "meaning": "시험", "contrast": null }
+      {
+        "word": "strike",
+        "meaning": "치다, 파업",
+        "contrast": null
+      },
+      {
+        "word": "spring",
+        "meaning": "봄, 용수철",
+        "contrast": null
+      },
+      {
+        "word": "street",
+        "meaning": "거리",
+        "contrast": null
+      },
+      {
+        "word": "desk",
+        "meaning": "책상",
+        "contrast": null
+      },
+      {
+        "word": "milk",
+        "meaning": "우유",
+        "contrast": null
+      },
+      {
+        "word": "strong",
+        "meaning": "강한",
+        "contrast": null
+      },
+      {
+        "word": "test",
+        "meaning": "시험",
+        "contrast": null
+      }
     ]
   },
   {
@@ -121,12 +361,37 @@
     "title": "R 모음 (ɚ)",
     "subtitle": "bird의 '어'는 혀를 만 채로 내는 소리예요",
     "words": [
-      { "word": "bird", "meaning": "새", "contrast": null },
-      { "word": "girl", "meaning": "소녀", "contrast": null },
-      { "word": "work", "meaning": "일하다", "contrast": "walk" },
-      { "word": "water", "meaning": "물", "contrast": null },
-      { "word": "teacher", "meaning": "선생님", "contrast": null },
-      { "word": "first", "meaning": "첫 번째", "contrast": null }
+      {
+        "word": "bird",
+        "meaning": "새",
+        "contrast": null
+      },
+      {
+        "word": "girl",
+        "meaning": "소녀",
+        "contrast": null
+      },
+      {
+        "word": "work",
+        "meaning": "일하다",
+        "contrast": "walk",
+        "contrastMeaning": "걷다"
+      },
+      {
+        "word": "water",
+        "meaning": "물",
+        "contrast": null
+      },
+      {
+        "word": "teacher",
+        "meaning": "선생님",
+        "contrast": null
+      },
+      {
+        "word": "first",
+        "meaning": "첫 번째",
+        "contrast": null
+      }
     ]
   }
 ]

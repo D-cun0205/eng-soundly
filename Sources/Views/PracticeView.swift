@@ -2,6 +2,9 @@ import SwiftUI
 
 struct PracticeView: View {
     let word: String
+    /// Minimal-pair partner (rice ↔ lice) and its Korean gloss, if any.
+    var contrast: String? = nil
+    var contrastMeaning: String? = nil
     /// Called after each successful diagnosis (used by drill sessions).
     var onDiagnosed: ((DiagnosisReport) -> Void)? = nil
 
@@ -46,6 +49,10 @@ struct PracticeView: View {
                 .padding(.vertical, 24)
                 .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 20))
 
+                if let contrast {
+                    minimalPairCard(contrast)
+                }
+
                 // Record button
                 recordButton
 
@@ -73,6 +80,63 @@ struct PracticeView: View {
         }
         .navigationTitle(word)
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// Why the "vs" word exists: one sound apart, completely different
+    /// meaning. Side-by-side listening makes the stakes concrete.
+    @ViewBuilder
+    private func minimalPairCard(_ contrast: String) -> some View {
+        let contrastIPA = appModel.dictionary.primary(for: contrast) ?? []
+
+        VStack(alignment: .leading, spacing: 10) {
+            Label("한 소리 차이", systemImage: "arrow.left.arrow.right")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 0) {
+                pairColumn(word: word, ipa: targetIPA, meaning: nil)
+                Text("↔")
+                    .font(.title3)
+                    .foregroundStyle(.tertiary)
+                    .frame(width: 32)
+                pairColumn(word: contrast, ipa: contrastIPA, meaning: contrastMeaning)
+            }
+
+            Text("이 발음을 놓치면 '\(word)'가 '\(contrast)\(contrastMeaning.map { " (\($0))" } ?? "")'로 들려요. 번갈아 들으며 차이를 잡아보세요.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.blue.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(.blue.opacity(0.15), lineWidth: 1))
+    }
+
+    @ViewBuilder
+    private func pairColumn(word: String, ipa: [String], meaning: String?) -> some View {
+        VStack(spacing: 4) {
+            Text(word)
+                .font(.headline)
+            if !ipa.isEmpty {
+                Text("/" + ipa.joined() + "/")
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+            }
+            if let meaning {
+                Text(meaning)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Button {
+                appModel.tts.speak(word)
+            } label: {
+                Image(systemName: "speaker.wave.2.fill")
+                    .font(.subheadline)
+            }
+            .buttonStyle(.bordered)
+            .clipShape(Capsule())
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var recordButton: some View {
